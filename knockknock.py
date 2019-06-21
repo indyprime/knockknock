@@ -19,6 +19,10 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
 USA
 
+--------
+date 20190620 - Mods to replace unsupported hping3 with scapy code
+Copyright (c) 2019 Indy <fireballiso@yahoo.com>
+
 """
 
 import time, os, sys
@@ -27,6 +31,7 @@ import subprocess
 
 from struct import *
 from knockknock.Profile import Profile
+from scapy.all import *
 
 def usage():
     print "Usage: knockknock.py -p <portToOpen> <host>"
@@ -97,26 +102,20 @@ def main(argv):
     
     (idField, seqField, ackField, winField) = unpack('!HIIH', packetData)
 
-    hping = existsInPath("hping3")
-
-    if hping is None:
-        print "Error, you must install hping3 first."
-        sys.exit(2)
-
-    command = [hping, "-S", "-c", "1",
-               "-p", str(knockPort),
-               "-N", str(idField),
-               "-w", str(winField),
-               "-M", str(seqField),
-               "-L", str(ackField),
-               host]
-    
     try:
-        subprocess.call(command, shell=False, stdout=open('/dev/null', 'w'), stderr=subprocess.STDOUT)
+        sport = random.randint(1024,65535)
+        ip=IP(dst=host,id=idField)
+        print('dst={0}, id={1}'.format(host,idField))
+        print('sport={0},dport={1},flags=\'S\',seq={2},window={3},ack={4}'.format(sport,int(knockPort),seqField,winField,ackField))
+
+        syn=TCP(sport=sport,dport=int(knockPort),flags='S',seq=seqField,window=winField,ack=ackField)
+
+        send(ip/syn)
+
         print 'Knock sent.'
 
     except OSError:
-        print "Error: Do you have hping3 installed?"
+#        print "Error: Do you have hping3 installed?"
         sys.exit(3)
 
 if __name__ == '__main__':
