@@ -1,3 +1,16 @@
+This is a fork of Moxie Marlinspike's knockknock software, to explore some changes.
+Original website: http://www.thoughtcrime.org/software/knockknock/ 
+
+My intentions:
+-Learn more about Python coding.
+-Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap. Please correct me if I'm mistaken.)
+-Add IPv6 support.
+-Update to Python3, since Python2.7 will end support on January 1, 2020.
+-?
+
+Indy (fireballiso@yahoo.com)
+
+(from the forked site)
 Some History:
 
     The port knockingconcept has been around for a while, and there
