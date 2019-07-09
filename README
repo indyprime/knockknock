@@ -1,6 +1,18 @@
+This is a fork of Moxie Marlinspike's knockknock software, to explore some changes.
+Original website: http://www.thoughtcrime.org/software/knockknock/ 
+
+My intentions:
+-Continue to learn Python coding.
+-Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap. Please correct me if I'm mistaken.)
+-Add IPv6 support.
+-Update to Python3, since Python2.7 will end support on January 1, 2020.
+-?
+
+Indy (fireballiso@yahoo.com)
+
 Some History:
 
-    The port knockingconcept has been around for a while, and there
+    The port knocking concept has been around for a while, and there
     are many different port knocking implementations.  The core idea
     is that you send a sequence of innocuous looking packets to a
     server, which have the effect of adjusting the firewall rules to
@@ -70,8 +82,9 @@ knockknock Overview:
         IND-CCA secure encrypted request to open a specified port from
         the source IP address.
 
-      * Fields from this packet are logged to kern.log and processed
-        by 'knockknock-daemon', which validates them.
+      * Fields from this packet are logged to kern.log (or another log
+        file) and processed by 'knockknock-daemon', which validates
+        them.
 
       * You connect from the client to the now-open port on the
         server.
