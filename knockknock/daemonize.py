@@ -20,6 +20,8 @@ __copyright__ = "Copyright (C) 2005 Chad J. Schroeder"
 __revision__  = "$Id$"
 __version__   = "0.2"
 
+# minor changes by Indy in 2019, to run under Python3
+
 import os               # Miscellaneous OS interfaces.
 import sys              # System-specific parameters and functions.
 
@@ -40,17 +42,16 @@ def createDaemon():
 
    try:
       pid = os.fork()
-   except OSError, e:
-      raise Exception, "%s [%d]" % (e.strerror, e.errno)
+   except OSError as e:
+      raise Exception("%s [%d]" % (e.strerror, e.errno))
 
    if (pid == 0):	# The first child.
       os.setsid()
 
       try:
          pid = os.fork()	# Fork a second child.
-      except OSError, e:
-         raise Exception, "%s [%d]" % (e.strerror, e.errno)
-
+      except OSError as e:
+         raise Exception("%s [%d]" % (e.strerror, e.errno))
       if (pid == 0):	# The second child.
          os.chdir(WORKDIR)
          os.umask(UMASK)
@@ -63,7 +64,7 @@ def createDaemon():
 #   maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
 #   if (maxfd == resource.RLIM_INFINITY):
 #      maxfd = MAXFD
-  
+
    # Iterate through and close all file descriptors.
 #   for fd in range(0, maxfd):
 #      try:

@@ -16,8 +16,8 @@
 # USA
 #
 
-import os, hmac, hashlib
-from MacFailedException import MacFailedException
+import os, hmac, hashlib, sys
+from .MacFailedException import MacFailedException
 from Crypto.Cipher import AES
 from struct import *
 
@@ -38,8 +38,8 @@ class CryptoEngine:
     def verifyMac(self, port, remoteMac):
         localMac = self.calculateMac(port)
 
-        if (localMac != remoteMac):
-            raise MacFailedException, "MAC Doesn't Match!"
+        if (not localMac.__eq__(remoteMac)):
+            raise MacFailedException('MAC doesn''t match!')
 
     def encryptCounter(self, counter):
         counterBytes = pack('!IIII', 0, 0, 0, counter)
@@ -49,37 +49,33 @@ class CryptoEngine:
         plaintextData += self.calculateMac(plaintextData)
         counterCrypt   = self.encryptCounter(self.counter)
         self.counter   = self.counter + 1
-        encrypted      = str()
-
+        encrypted = bytearray()
         for i in range((len(plaintextData))):
-            encrypted += chr(ord(plaintextData[i]) ^ ord(counterCrypt[i]))
+            encrypted.append(plaintextData[i] ^ counterCrypt[i])
 
         self.profile.setCounter(self.counter)
         self.profile.storeCounter()
-
         return encrypted
 
     def decrypt(self, encryptedData, windowSize):
         for x in range(windowSize):
             try:
                 counterCrypt = self.encryptCounter(self.counter + x)
-                decrypted    = str()
-                
+                decrypted = bytearray()
                 for i in range((len(encryptedData))):
-                    decrypted += chr(ord(encryptedData[i]) ^ ord(counterCrypt[i]))
-                    
+                    decrypted.append(encryptedData[i] ^ counterCrypt[i])
+
                 port = decrypted[:2]
                 mac  = decrypted[2:]
-                    
                 self.verifyMac(port, mac)
                 self.counter += x + 1
 
                 self.profile.setCounter(self.counter)
                 self.profile.storeCounter()
 
-                return int(unpack("!H", port)[0])
+                return int(unpack('!H', port)[0])
 
             except MacFailedException:
                 pass
 
-        raise MacFailedException, "Ciphertext failed to decrypt in range..."
+        raise MacFailedException('Ciphertext failed to decrypt in range...')

@@ -19,7 +19,7 @@
 import os, syslog, time
 import subprocess
 
-from RuleTimer import RuleTimer
+from .RuleTimer import RuleTimer
 
 class PortOpener:
 
@@ -34,11 +34,11 @@ class PortOpener:
 
             if sourceIP == "" or port == "":
                 syslog.syslog("knockknock.PortOpener: Parent process is closed.  Terminating.")
-                os._exit(4)                    
+                os._exit(4)
 
             description = 'INPUT -m limit --limit 1/minute --limit-burst 1 -m state --state NEW -p tcp -s ' + sourceIP + ' --dport ' + str(port) + ' -j ACCEPT'
             command     = 'iptables -I ' + description
-            command     = command.split()            
+            command     = command.split()
 
             subprocess.call(command, shell=False)
 

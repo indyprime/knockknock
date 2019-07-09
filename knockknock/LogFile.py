@@ -21,11 +21,11 @@ import string, sys, os, syslog, time
 class LogFile:
 
     def __init__(self, file):
-        self.file = file        
+        self.file = file
 
     def checkForFileRotate(self, fd):
         freshFile = open(self.file)
-            
+
         if (os.path.sameopenfile(freshFile.fileno(), fd.fileno())):
             freshFile.close()
             return fd
@@ -36,7 +36,7 @@ class LogFile:
     def tail(self):
         fd = open(self.file)
         fd.seek(0, os.SEEK_END)
-        
+
         while True:
             fd    = self.checkForFileRotate(fd)
             where = fd.tell()

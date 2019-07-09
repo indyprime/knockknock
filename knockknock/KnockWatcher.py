@@ -18,8 +18,8 @@
 
 import syslog
 
-from LogEntry import LogEntry
-from MacFailedException import MacFailedException
+from .LogEntry import LogEntry
+from .MacFailedException import MacFailedException
 
 class KnockWatcher:
 
@@ -40,11 +40,11 @@ class KnockWatcher:
                         ciphertext = logEntry.getEncryptedData()
                         port       = profile.decrypt(ciphertext, self.config.getWindow())
                         sourceIP   = logEntry.getSourceIP()
-                    
+
                         self.portOpener.open(sourceIP, port)
-                        syslog.syslog("Received authenticated port-knock for port " + str(port) + " from " + sourceIP)
+                        syslog.syslog('Received authenticated port-knock for port ' + str(port) + ' from ' + sourceIP)
                     except MacFailedException:
                         pass
             except:
-#                print "Unexpected error:", sys.exc_info()
-                syslog.syslog("knocknock skipping unrecognized line.")
+                print('Unexpected error:', sys.exc_info())
+                syslog.syslog('knocknock skipping unrecognized line.')

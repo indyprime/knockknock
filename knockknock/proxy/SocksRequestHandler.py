@@ -29,31 +29,31 @@ class SocksRequestHandler(asynchat.async_chat):
         self.set_terminator(self.INITIAL_HEADER_LEN)
 
     def sendSuccessResponse(self, localIP, localPort):
-        response = "\x05\x00\x00\x01" 
-        
-        quad = localIP.split(".")
-        
+        response = '\x05\x00\x00\x01'
+
+        quad = localIP.split('.')
+
         for segment in quad:
             response = response + chr(int(segment))
-        
+
         response = response + pack('!H', int(localPort))
 
         self.push(response)
 
     def sendCommandNotSupportedResponse(self):
-        response = "\x05\x07\x00\x01\x00\x00\x00\x00\x00\x00"
+        response = '\x05\x07\x00\x01\x00\x00\x00\x00\x00\x00'
         self.push(response)
 
     def sendAddressNotSupportedResponse(self):
-        response = "\x05\x08\x00\x01\x00\x00\x00\x00\x00\x00"
+        response = '\x05\x08\x00\x01\x00\x00\x00\x00\x00\x00'
         self.push(response)
 
     def sendAuthenticationResponse(self, method):
-        response = "\x05" + chr(method)
+        response = '\x05' + chr(method)
         self.push(response)
 
     def setupEndpoint(self):
-        if (self.addressType == 0x01):            
+        if (self.addressType == 0x01):
             profile = self.profiles.getProfileForIP(self.address)
         else:
             profile = self.profiles.getProfileForName(self.address)
@@ -68,7 +68,7 @@ class SocksRequestHandler(asynchat.async_chat):
         self.rawAddressAndPort = self.input
 
         if (self.addressType == 0x01):
-            self.address = str(ord(self.input[0])) + "." + str(ord(self.input[1])) + "." + str(ord(self.input[2])) + "." + str(ord(self.input[3]))
+            self.address = str(ord(self.input[0])) + '.' + str(ord(self.input[1])) + '.' + str(ord(self.input[2])) + '.' + str(ord(self.input[3]))
         else:
             self.address = self.input[0:-2]
 
@@ -97,7 +97,7 @@ class SocksRequestHandler(asynchat.async_chat):
             return 1
         else:
             self.sendAddressNotSupportedResponse()
-            self.handle_close()        
+            self.handle_close()
 
     def processAuthenticationMethod(self):
         for method in self.input:
@@ -124,15 +124,14 @@ class SocksRequestHandler(asynchat.async_chat):
             self.endpoint.handle_close()
 
         asynchat.async_chat.handle_close(self)
-        
 
     # async_chat impl
 
     def printHex(self, val):
         for c in val:
-            print "%#x" % ord(c),
-            
-        print ""
+            print('%#x' % ord(c), end=' ')
+
+        print('')
 
     def collect_incoming_data(self, data):
         if (self.endpoint != None):
@@ -141,17 +140,17 @@ class SocksRequestHandler(asynchat.async_chat):
             self.input.append(data)
 
     def found_terminator(self):
-        self.input = "".join(self.input)
+        self.input = ''.join(self.input)
         terminator = self.stateMachine[self.state]()
         self.input = []
         self.state = self.state + 1
-        
+
         self.set_terminator(terminator)
-    
+
     # Shuttle Methods
 
     def connectSucceeded(self, localIP, localPort):
         self.sendSuccessResponse(localIP, localPort)
-        
+
     def receivedData(self, data):
         self.push(data)

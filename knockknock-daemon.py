@@ -36,21 +36,21 @@ import knockknock.daemonize
 
 def checkPrivileges():
     if (not os.geteuid() == 0):
-        print "Sorry, you have to run knockknock-daemon as root."
+        print('Sorry, you have to run knockknock-daemon as root.')
         sys.exit(3)
 
 def checkConfiguration():
     if (not os.path.isdir('/etc/knockknock.d/')):
-        print "/etc/knockknock.d/ does not exist.  You need to setup your profiles first.."
+        print('/etc/knockknock.d/ does not exist.  You need to setup your profiles first...')
         sys.exit(3)
 
     if (not os.path.isdir('/etc/knockknock.d/profiles/')):
-        print "/etc/knockknock.d/profiles/ does not exist.  You need to setup your profiles first..."
+        print('/etc/knockknock.d/profiles/ does not exist.  You need to setup your profiles first...')
         sys.exit(3)
 
 def dropPrivileges():
     nobody = pwd.getpwnam('nobody')
-    adm    = grp.getgrnam('adm')
+    adm    = grp.getgrnam('nobody')
 
     os.setgroups([adm.gr_gid])
     os.setgid(adm.gr_gid)
@@ -61,9 +61,11 @@ def handleFirewall(input, config):
     portOpener.waitForRequests()
 
 def handleKnocks(output, profiles, config):
-    dropPrivileges()
-    
-    logFile      = LogFile('/var/log/kern.log')
+##    dropPrivileges()
+
+    # set logFile to location of iptable logs
+    #logFile      = LogFile('/var/log/kern.log')
+    logFile      = LogFile('/var/log/messages')
     portOpener   = PortOpener(output, config.getDelay())
     knockWatcher = KnockWatcher(config, logFile, profiles, portOpener)
 
@@ -77,7 +79,7 @@ def main(argv):
     config     = DaemonConfiguration('/etc/knockknock.d/config')
 
     if (profiles.isEmpty()):
-        print 'WARNING: Running knockknock-daemon without any active profiles.'
+        print('WARNING: Running knockknock-daemon without any active profiles.')
 
     knockknock.daemonize.createDaemon()
 
@@ -90,6 +92,6 @@ def main(argv):
     else:
         os.close(output)
         handleFirewall(os.fdopen(input, 'r'), config)
-                
+
 if __name__ == '__main__':
     main(sys.argv[1:])

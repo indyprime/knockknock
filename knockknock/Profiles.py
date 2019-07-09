@@ -17,7 +17,7 @@
 #
 
 import os, socket
-from Profile import Profile
+from .Profile import Profile
 
 class Profiles:
 
@@ -45,7 +45,7 @@ class Profiles:
     def getProfileForIP(self, ip):
         for profile in self.profiles:
             ips = profile.getIPAddrs()
-                        
+
             if ip in ips:
                 return profile
 
@@ -55,7 +55,7 @@ class Profiles:
         for profile in self.profiles:
             name                     = profile.getName()
             address, alias, addrlist = socket.gethostbyname_ex(name)
-            
+
             profile.setIPAddrs(addrlist)
 
     def isEmpty(self):

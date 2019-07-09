@@ -17,12 +17,12 @@
 #
 
 import os, string
-import ConfigParser
+import configparser
 import binascii
 import stat
 from struct import *
 
-from CryptoEngine import CryptoEngine
+from .CryptoEngine import CryptoEngine
 
 class Profile:
 
@@ -59,7 +59,7 @@ class Profile:
         return self.ipAddressList
 
     def setIPAddrs(self, ipAddressList):
-        self.ipAddressList = ipAddressList        
+        self.ipAddressList = ipAddressList
 
     def getName(self):
         return self.name
@@ -84,64 +84,64 @@ class Profile:
     # Serialization Methods
 
     def loadCipherKey(self):
-        return self.loadKey(self.directory + "/cipher.key")
+        return self.loadKey(self.directory + '/cipher.key')
 
     def loadMacKey(self):
-        return self.loadKey(self.directory + "/mac.key")
+        return self.loadKey(self.directory + '/mac.key')
 
     def loadCounter(self):
-        # Privsep bullshit...
+        # Privsep rubbish...
         if (self.counterFile == None):
-            self.counterFile = open(self.directory + "/counter", 'r+')
+            self.counterFile = open(self.directory + '/counter', 'r+')
 
         counter = self.counterFile.readline()
-        counter = counter.rstrip("\n")
+        counter = counter.rstrip('\n')
 
         return int(counter)
 
     def loadConfig(self):
-        config = ConfigParser.SafeConfigParser()
-        config.read(self.directory + "/config")
-        
+        config = configparser.SafeConfigParser()
+        config.read(self.directory + '/config')
+
         return config.get('main', 'knock_port')
 
     def loadKey(self, keyFile):
         file = open(keyFile, 'r')
-        key  = binascii.a2b_base64(file.readline())        
+        key  = binascii.a2b_base64(file.readline())
 
         file.close()
         return key
 
-    def storeCipherKey(self):        
-        self.storeKey(self.cipherKey, self.directory + "/cipher.key")
+    def storeCipherKey(self):
+        self.storeKey(self.cipherKey, self.directory + '/cipher.key')
 
     def storeMacKey(self):
-        self.storeKey(self.macKey, self.directory + "/mac.key")
+        self.storeKey(self.macKey, self.directory + '/mac.key')
 
     def storeCounter(self):
-        # Privsep bullshit...
+        # Privsep rubbish...
         if (self.counterFile == None):
             self.counterFile = open(self.directory + '/counter', 'w')
             self.setPermissions(self.directory + '/counter')
 
         self.counterFile.seek(0)
-        self.counterFile.write(str(self.counter) + "\n")
+        self.counterFile.write(str(self.counter) + '\n')
         self.counterFile.flush()
 
     def storeConfig(self):
-        config = ConfigParser.SafeConfigParser()
+        config = configparser.SafeConfigParser()
         config.add_section('main')
         config.set('main', 'knock_port', str(self.knockPort))
 
-        configFile = open(self.directory + "/config", 'w')
+        configFile = open(self.directory + '/config', 'w')
         config.write(configFile)
         configFile.close()
 
-        self.setPermissions(self.directory + "/config")
+        self.setPermissions(self.directory + '/config')
 
     def storeKey(self, key, path):
         file = open(path, 'w')
-        file.write(binascii.b2a_base64(key))
+        file.write(binascii.b2a_base64(key).decode('utf-8'))
         file.close()
 
         self.setPermissions(path)
@@ -155,6 +155,6 @@ class Profile:
 
     def printHex(self, val):
         for c in val:
-            print "%#x" % ord(c),
-            
-        print ""
+            print('%#x' % ord(c), end=' ')
+
+        print('')
