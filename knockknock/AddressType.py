@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Moxie Marlinspike
+# Copyright (c) 2019 Indy <fireballiso@yahoo.com>
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,27 +16,12 @@
 # USA
 #
 
-import subprocess
-import time
-import threading
+import ipaddress
 
-from .AddressType import isIPv6
+def isIPv6(addr):
+    try:
+        tmpAddr = ipaddress.IPv6Address(addr)
+        return True
+    except ipaddress.AddressValueError:
+        return False
 
-class RuleTimer(threading.Thread):
-
-    def __init__(self, openDuration, description, addrIsIPv6):
-        self.openDuration = openDuration
-        self.description  = description
-        self.addrIsIPv6 = addrIsIPv6
-        threading.Thread.__init__(self)
-
-    def run(self):
-        time.sleep(self.openDuration)
-        if self.addrIsIPv6:
-            command = 'ip6tables -D ' + self.description
-        else:
-            command = 'iptables -D ' + self.description
-
-        command = command.split()
-
-        subprocess.call(command, shell=False)

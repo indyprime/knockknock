@@ -19,7 +19,6 @@
 import string
 from struct import *
 
-
 class LogEntry:
 
     def __init__(self, line):
@@ -40,8 +39,11 @@ class LogEntry:
         except KeyError:
             return -1
 
-    def getEncryptedData(self):
-        return pack('!HIIH', int(self.tokenMap['ID']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
+    def getEncryptedData(self, addrIsIPv6):
+        if addrIsIPv6:
+            return pack('!HIIH', int(self.tokenMap['FLOWLBL']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
+        else:
+            return pack('!HIIH', int(self.tokenMap['ID']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
 
     def getSourceIP(self):
         return self.tokenMap['SRC']

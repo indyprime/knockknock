@@ -16,10 +16,11 @@
 # USA
 #
 
-import syslog
+import syslog, sys
 
 from .LogEntry import LogEntry
 from .MacFailedException import MacFailedException
+from .AddressType import isIPv6
 
 class KnockWatcher:
 
@@ -37,9 +38,9 @@ class KnockWatcher:
 
                 if (profile != None):
                     try:
-                        ciphertext = logEntry.getEncryptedData()
-                        port       = profile.decrypt(ciphertext, self.config.getWindow())
                         sourceIP   = logEntry.getSourceIP()
+                        ciphertext = logEntry.getEncryptedData(isIPv6(sourceIP))
+                        port       = profile.decrypt(ciphertext, self.config.getWindow())
 
                         self.portOpener.open(sourceIP, port)
                         syslog.syslog('Received authenticated port-knock for port ' + str(port) + ' from ' + sourceIP)
@@ -48,3 +49,4 @@ class KnockWatcher:
             except:
                 print('Unexpected error:', sys.exc_info())
                 syslog.syslog('knocknock skipping unrecognized line.')
+
