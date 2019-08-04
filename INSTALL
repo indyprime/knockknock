@@ -1,18 +1,17 @@
 Requirements:
   
-    * Python >= 2.4 (apt-get install python)
-    * PyCrypt (apt-get install python-crypto)
-    * hping3 (client only -- apt-get install hping3)
+    * Python 3 (apt-get install python3)
+    * PyCrypt (pip install pycrypto)
+    * scapy (git clone https://github.com/secdev/scapy.git)
   
-Installing The Server:
+Installing The Server: ******* TODO: update *******
 
     After installing the requirements, the first step is to download,
     unpack, and install the knockknock tarball:
     
-      * wget
-        http://www.thoughtcrime.org/software/knockknock/knockknock-0.5.tar.gz
-      * tar zxvf knockknock-0.5.tar.gz
-      * cd knockknock-0.5
+      * wget https://github.com/indyprime/knockknock/archive/master.zip
+      * tar zxvf master.zip
+      * cd knockknock
       * sudo python setup.py install
     
     Once this is done, we need to configure the server.
@@ -31,11 +30,11 @@ Configuring The Server:
   
     You can create profiles on the server by running:
   
-    * sudo knockknock-genprofile <knockPort> <profileName>
+    * sudo knockknock-genprofile <profileName> <knockPort> 
   
     So, for instance, if we wished to create a profile for
     'clement-laptop' that used '666' as a knock port, we'd run 'sudo
-    knockknock-genprofile 666 clement-laptop'
+    knockknock-genprofile clement-laptop 666'
   
     That's it, your server is now configured.  To run it, simply
     execute:
