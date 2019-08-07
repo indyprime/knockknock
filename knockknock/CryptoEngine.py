@@ -38,7 +38,7 @@ class CryptoEngine:
     def verifyMac(self, port, remoteMac):
         localMac = self.calculateMac(port)
 
-        if (not localMac == remoteMac):
+        if (localMac != remoteMac):
             raise MacFailedException('MAC doesn''t match!')
 
     def encryptCounter(self, counter):
