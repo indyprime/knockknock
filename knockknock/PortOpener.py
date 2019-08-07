@@ -30,11 +30,11 @@ class PortOpener:
 
     def waitForRequests(self):
         while True:
-            sourceIP    = self.stream.readline().rstrip("\n")
-            port        = self.stream.readline().rstrip("\n")
+            sourceIP    = self.stream.readline().rstrip('\n')
+            port        = self.stream.readline().rstrip('\n')
 
-            if sourceIP == "" or port == "":
-                syslog.syslog("knockknock.PortOpener: Parent process is closed.  Terminating.")
+            if sourceIP == '' or port == '':
+                syslog.syslog('knockknock.PortOpener: Parent process is closed.  Terminating.')
                 os._exit(4)
 
             description = 'INPUT -m limit --limit 1/minute --limit-burst 1 -m state --state NEW -p tcp -s ' + sourceIP + ' --dport ' + str(port) + ' -j ACCEPT'
@@ -52,9 +52,9 @@ class PortOpener:
 
     def open(self, sourceIP, port):
         try:
-            self.stream.write(sourceIP + "\n")
-            self.stream.write(str(port) + "\n")
+            self.stream.write(sourceIP + '\n')
+            self.stream.write(str(port) + '\n')
             self.stream.flush()
         except:
-            syslog.syslog("knockknock:  Error, PortOpener process has died.  Terminating.")
+            syslog.syslog('knockknock:  Error, PortOpener process has died.  Terminating.')
             os._exit(4)

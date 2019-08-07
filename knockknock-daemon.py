@@ -50,7 +50,7 @@ def checkConfiguration():
 
 def dropPrivileges():
     nobody = pwd.getpwnam('nobody')
-    adm    = grp.getgrnam('nobody')
+    adm    = grp.getgrnam('adm')
 
     os.setgroups([adm.gr_gid])
     os.setgid(adm.gr_gid)
@@ -61,7 +61,7 @@ def handleFirewall(input, config):
     portOpener.waitForRequests()
 
 def handleKnocks(output, profiles, config):
-##    dropPrivileges()
+#    dropPrivileges()
 
     # set logFile to location of iptable logs
     #logFile      = LogFile('/var/log/kern.log')
