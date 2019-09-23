@@ -40,10 +40,14 @@ class LogEntry:
             return -1
 
     def getEncryptedData(self, addrIsIPv6):
-        if addrIsIPv6:
-            return pack('!HIIH', int(self.tokenMap['FLOWLBL']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
-        else:
-            return pack('!HIIH', int(self.tokenMap['ID']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
+        try:
+            if addrIsIPv6:
+                return pack('!HIIH', int(self.tokenMap['FLOWLBL']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
+            else:
+                return pack('!HIIH', int(self.tokenMap['ID']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
+        except KeyError:
+            #tokenizer didn't find one of the expected tokens, so this log entry won't have the needed information; indicate that we can stop decryption
+            return -1
 
     def getSourceIP(self):
         return self.tokenMap['SRC']

@@ -40,10 +40,11 @@ class KnockWatcher:
                     try:
                         sourceIP   = logEntry.getSourceIP()
                         ciphertext = logEntry.getEncryptedData(isIPv6(sourceIP))
-                        port       = profile.decrypt(ciphertext, self.config.getWindow())
+                        if ciphertext != -1:
+                            port = profile.decrypt(ciphertext, self.config.getWindow())
 
-                        self.portOpener.open(sourceIP, port)
-                        syslog.syslog('Received authenticated port-knock for port ' + str(port) + ' from ' + sourceIP)
+                            self.portOpener.open(sourceIP, port)
+                            syslog.syslog('Received authenticated port-knock for port ' + str(port) + ' from ' + sourceIP)
                     except MacFailedException:
                         pass
             except:
