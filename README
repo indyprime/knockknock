@@ -3,7 +3,7 @@ Original website: http://www.thoughtcrime.org/software/knockknock/
 
 My intentions:
 -Continue to learn Python coding.
--Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap. Please correct me if I'm mistaken.)
+-Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.)
 -Add IPv6 support.
 -Update to Python3, since Python2.7 will end support on January 1, 2020.
 -?
@@ -14,7 +14,7 @@ Some History:
 
     The port knocking concept has been around for a while, and there
     are many different port knocking implementations.  The core idea
-    is that you send a sequence of innocuous looking packets to a
+    is that you send a sequence of innocuous-looking packets to a
     server, which have the effect of adjusting the firewall rules to
     allow you to connect through on a port that was previously
     firewalled off.
@@ -37,7 +37,7 @@ Some History:
     Let me tell you what I /don't/ want from a port knocking
     implementation:
     
-      * I don't want something written in an an unsafe language.  This
+      * I don't want something written in an unsafe language.  This
         should be a very small application, and the performance
         requirements should be minimal.  
       * I don't want something that runs /in the kernel/.  
@@ -149,4 +149,3 @@ Why Is This Even Necessary?
     to expose as few of them to the world as possible.  I offer
     knockknock as a possible solution to minimizing exposure.
   
-
