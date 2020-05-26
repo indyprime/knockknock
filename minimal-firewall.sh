@@ -15,6 +15,9 @@ $IPTABLES -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
 $IPTABLES -A OUTPUT -m state --state NEW,RELATED,ESTABLISHED -j ACCEPT
 $IPTABLES -A OUTPUT -j ACCEPT
 
+# Allow connections to self
+$IPTABLES -A INPUT -s 127.0.0.1 -m state --state NEW,ESTABLISHED -j ACCEPT
+
 # We want to reject any attempts to forward
 $IPTABLES -A FORWARD -j REJECT
 

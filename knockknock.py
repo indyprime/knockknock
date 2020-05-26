@@ -37,10 +37,10 @@ from knockknock.AddressType import isIPv6
 from socket import getaddrinfo, IPPROTO_UDP
 
 def usage():
-    print('Usage: knockknock.py -p <portToOpen> [-s source_ip] [-d destination_ip] <host>')
-    print('\t source_ip can be optionally set, to specifically use a certain source IP')
-    print('\t destination_ip can be optionally set, to use that instead of resolving the\n'
-        + 'hostname; that way, the \"host\" is only used as a profile name')
+    print('Usage: knockknock.py -p <portToOpen> [-s source_ip] [-d destination_ip] <host>'
+        + '\t* source_ip can be optionally set, to specifically use a certain source IP'
+        + '\t* destination_ip can be optionally set, to use that instead of resolving the\n'
+        + '\thostname; that way, the \"host\" is only used as a profile name')
     sys.exit(2)
 
 def parseArguments(argv):

@@ -30,13 +30,14 @@ class CryptoEngine:
         self.cipherKey = cipherKey
         self.cipher    = AES.new(self.cipherKey, AES.MODE_ECB)
 
-    def calculateMac(self, port):
-        hmacSha = hmac.new(self.macKey, port, hashlib.sha1)
+    def calculateMac(self, counter, ciphertext):
+        counterBytes = pack('!I', counter)
+        hmacSha = hmac.new(self.macKey, counterBytes + ciphertext, hashlib.sha1)
         mac     = hmacSha.digest()
         return mac[:10]
 
-    def verifyMac(self, port, remoteMac):
-        localMac = self.calculateMac(port)
+    def verifyMac(self, counter, encryptedPort, remoteMac):
+        localMac = self.calculateMac(counter, encryptedPort)
 
         if (localMac != remoteMac):
             raise MacFailedException('MAC doesn''t match!')
@@ -46,35 +47,40 @@ class CryptoEngine:
         return self.cipher.encrypt(counterBytes)
 
     def encrypt(self, plaintextData):
-        plaintextData += self.calculateMac(plaintextData)
         counterCrypt   = self.encryptCounter(self.counter)
-        self.counter   = self.counter + 1
 
         encrypted = bytearray()
         for i in range(len(plaintextData)):
             encrypted.append(plaintextData[i] ^ counterCrypt[i])
 
+        mac = self.calculateMac(self.counter, encrypted)
+
+        self.counter = self.counter + 1
         self.profile.setCounter(self.counter)
         self.profile.storeCounter()
-        return encrypted
+
+        return encrypted + mac
 
     def decrypt(self, encryptedData, windowSize):
         for x in range(windowSize):
             try:
-                counterCrypt = self.encryptCounter(self.counter + x)
-                decrypted = bytearray()
-                for i in range((len(encryptedData))):
-                    decrypted.append(encryptedData[i] ^ counterCrypt[i])
+                encryptedPort = encryptedData[:2]
+                mac = encryptedData[2:]
 
-                port = decrypted[:2]
-                mac  = decrypted[2:]
-                self.verifyMac(port, mac)
+                self.verifyMac(self.counter + x, encryptedPort, mac)
+
+                counterCrypt = self.encryptCounter(self.counter + x)
+                decryptedPort = bytearray()
+
+                for i in range((len(encryptedPort))):
+                    decryptedPort.append(encryptedPort[i] ^ counterCrypt[i])
+
                 self.counter += x + 1
 
                 self.profile.setCounter(self.counter)
                 self.profile.storeCounter()
 
-                return int(unpack('!H', port)[0])
+                return int(unpack('!H', decryptedPort)[0])
 
             except MacFailedException:
                 pass

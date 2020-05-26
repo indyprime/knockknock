@@ -6,6 +6,7 @@ My intentions:
 -Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.)
 -Add IPv6 support.
 -Update to Python3, since Python2.7 will end support on January 1, 2020.
+-Change from authenticate-then-encrypt to encrypt-then-authenticate. Thanks to anonion0 for the patch for the original code (https://github.com/moxie0/knockknock/pull/6)
 -?
 
 Indy (fireballiso@yahoo.com)
@@ -96,7 +97,7 @@ knockknock Overview:
     That's it.  Written in python, simple, single-packet, secure.
   
     The request is encrypted using AES in CTR mode, with an HMAC-SHA1
-    using the authenticate-then-encrypt paradigm.  It protects against
+    using the encrypt-then-authenticate paradigm.  It protects against
     evesdropping, replay attacks, and all known forms of cryptanalysis
     against IND-CCA secure schemes.
   

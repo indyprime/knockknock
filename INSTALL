@@ -1,8 +1,13 @@
 Requirements:
   
-    * Python 3 (apt-get install python3)
+    * Python 3 (should already have this, since Python 2 is deprecated now)
+    * Python 3 development libraries/headers (Fedora Linux: dnf install dnf python3-devel)
     * PyCrypt (pip install pycrypto)
     * scapy (git clone https://github.com/secdev/scapy.git)
+        * To install, follow the instructions on https://scapy.readthedocs.io/en/latest/installation.html,
+          in the "Current development version" section. There's also instructions to update & install
+          newer versions as they become available, which will likely be more frequent than Linux
+          distributions update their scapy packages.
   
 Installing The Server: ******* TODO: update *******
 
@@ -12,7 +17,22 @@ Installing The Server: ******* TODO: update *******
       * wget https://github.com/indyprime/knockknock/archive/master.zip
       * tar zxvf master.zip
       * cd knockknock
-      * sudo python setup.py install
+
+    The server needs to be running some kind of syslog service (like
+    rsyslog or syslog-ng, for example) that saves iptables logs to
+    a text file (like /var/log/kern); it doesn't support the systemd
+    journalctl (though patches would be welcome!). If your system doesn't
+    have a syslog-like service, you would need to install one to get the
+    text logfiles. This is beyond the scope of these instructions, and will
+    depend on server's operating system version.
+
+    Before installing knockknock, look at the logFile variable in the
+    knockknock-daemon.py file, and make sure it has the correct name of
+    the file where iptable logs are saved.
+
+    When ready, install files:
+  
+      * sudo python ./setup.py install
     
     Once this is done, we need to configure the server.
   
@@ -35,7 +55,7 @@ Configuring The Server:
     So, for instance, if we wished to create a profile for
     'clement-laptop' that used '666' as a knock port, we'd run 'sudo
     knockknock-genprofile clement-laptop 666'
-  
+
     That's it, your server is now configured.  To run it, simply
     execute:
   
