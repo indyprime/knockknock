@@ -5,7 +5,7 @@ My intentions:
 -Continue to learn Python coding.
 -Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.)
 -Add IPv6 support.
--Update to Python3, since Python2.7 will end support on January 1, 2020.
+-Update to Python3, since Python2.7 ended official support on January 1, 2020.
 -Change from authenticate-then-encrypt to encrypt-then-authenticate. Thanks to anonion0 for the patch for the original code (https://github.com/moxie0/knockknock/pull/6)
 -?
 
