@@ -1,8 +1,8 @@
 Requirements:
   
     * Python 3 (should already have this, since Python 2 is deprecated now)
-    * Python 3 development libraries/headers (Fedora Linux: dnf install dnf python3-devel)
-    * PyCrypt (pip install pycrypto)
+    * Python 3 development libraries/headers (Fedora Linux: dnf install python3-devel)
+    * PyCrypt (pip3 install pycryptodome) (alternately, for Fedora Linux: dnf install python3-pycryptodomex)
     * scapy (git clone https://github.com/secdev/scapy.git)
         * To install, follow the instructions on https://scapy.readthedocs.io/en/latest/installation.html,
           in the "Current development version" section. There's also instructions to update & install
@@ -28,7 +28,7 @@ Installing The Server: ******* TODO: update *******
 
     Before installing knockknock, look at the logFile variable in the
     knockknock-daemon.py file, and make sure it has the correct name of
-    the file where iptable logs are saved.
+    the file where the iptables logs are saved.
 
     When ready, install files:
   
