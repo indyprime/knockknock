@@ -18,7 +18,7 @@
 
 import os, hmac, hashlib, sys
 from .MacFailedException import MacFailedException
-from Crypto.Cipher import AES
+from Cryptodome.Cipher import AES
 from struct import *
 
 class CryptoEngine:
