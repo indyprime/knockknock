@@ -2,19 +2,20 @@ This is a fork of Moxie Marlinspike's knockknock software, to explore some chang
 Original website: http://www.thoughtcrime.org/software/knockknock/ 
 
 My intentions:
--Continue to learn Python coding.
--Replaced the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.)
--Added IPv6 support.
--Updatee to Python3, since Python2.7 ended official support on January 1, 2020.
--Changed from authenticate-then-encrypt to encrypt-then-authenticate. Thanks to anonion0 for the patch for the original code (https://github.com/moxie0/knockknock/pull/6)
--Note: knockknock-proxy doesn't work yet under Python3; it is a low priority, as I don't use it and don't know anyone else that does.
+-Update to Python3, since Python2.7 ended official support on January 1, 2020. - done
+-Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.) - done
+-Added IPv6 support - done
+-Change from authenticate-then-encrypt to encrypt-then-authenticate. Thanks to anonion0 for the patch for the original code (https://github.com/moxie0/knockknock/pull/6) - done
+-Update to allow systemd journal instead of syslog. Thanks to Rtzq0 which got me started with his patch for the original code (https://github.com/moxie0/knockknock/pulls/Rtzq0) - underway...
+-Continue to learn Python coding. - Ongoing...
 -?
+
+Note: knockknock-proxy doesn't work yet under Python3; it isn't a priority, as I don't use it and don't know anyone else that does.
 
 Indy (fireballiso@yahoo.com)
 
-No
 
-Some History:
+Some History (mostly from Moxie's original repo):
 
     The port knocking concept has been around for a while, and there
     are many different port knocking implementations.  The core idea
