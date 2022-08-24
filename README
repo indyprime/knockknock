@@ -3,13 +3,16 @@ Original website: http://www.thoughtcrime.org/software/knockknock/
 
 My intentions:
 -Continue to learn Python coding.
--Replace the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.)
--Add IPv6 support.
--Update to Python3, since Python2.7 ended official support on January 1, 2020.
--Change from authenticate-then-encrypt to encrypt-then-authenticate. Thanks to anonion0 for the patch for the original code (https://github.com/moxie0/knockknock/pull/6)
+-Replaced the unsupported hping3 utility with scapy code. (Still shouldn't need libpcap.)
+-Added IPv6 support.
+-Updatee to Python3, since Python2.7 ended official support on January 1, 2020.
+-Changed from authenticate-then-encrypt to encrypt-then-authenticate. Thanks to anonion0 for the patch for the original code (https://github.com/moxie0/knockknock/pull/6)
+-Note: knockknock-proxy doesn't work yet under Python3; it is a low priority, as I don't use it and don't know anyone else that does.
 -?
 
 Indy (fireballiso@yahoo.com)
+
+No
 
 Some History:
 
