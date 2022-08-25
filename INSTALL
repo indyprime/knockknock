@@ -1,7 +1,7 @@
 Requirements:
   
     * Python 3 (should already have this, since Python 2 is deprecated now)
-    * Python 3 development libraries/headers (Fedora Linux: dnf install python3-devel)
+    * Python 3 development libraries/headers (Fedora Linux: dnf install python3-devel python3-systemd)
     * PyCrypt (pip3 install pycryptodome) (alternately, for Fedora Linux: dnf install python3-pycryptodomex)
     * scapy (git clone https://github.com/secdev/scapy.git)
         * To install, follow the instructions on https://scapy.readthedocs.io/en/latest/installation.html,
@@ -145,7 +145,7 @@ Using knockknock:
     as you connect, no further connections will be allowed unless
     another knockknock request is issued.
 
-Optionally using knockknock-proxy:
+Optionally using knockknock-proxy (not working under python3 - see README):
 
    After you have the basic knockknock system running, you might find
    yourself wishing that you didn't have to type "knockknock -p
