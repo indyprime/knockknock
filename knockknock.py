@@ -38,9 +38,9 @@ from socket import getaddrinfo, IPPROTO_UDP
 
 def usage():
     print('Usage: knockknock.py -p <portToOpen> [-s source_ip] [-d destination_ip] <host>'
-        + '\t* source_ip can be optionally set, to specifically use a certain source IP'
-        + '\t* destination_ip can be optionally set, to use that instead of resolving the\n'
-        + '\thostname; that way, the \"host\" is only used as a profile name')
+        + '\n\t* source_ip can be optionally set, to specifically use a certain source IP'
+        + '\n\t* destination_ip can be optionally set, to use that instead of resolving the'
+        + '\n\t  hostname; that way, the \"host\" is only used as a profile name')
     sys.exit(2)
 
 def parseArguments(argv):

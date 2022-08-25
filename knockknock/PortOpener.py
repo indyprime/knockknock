@@ -30,8 +30,8 @@ class PortOpener:
 
     def waitForRequests(self):
         while True:
-            sourceIP    = self.stream.readline().rstrip('\n')
-            port        = self.stream.readline().rstrip('\n')
+            sourceIP = self.stream.readline().rstrip('\n')
+            port = self.stream.readline().rstrip('\n')
 
             if sourceIP == '' or port == '':
                 syslog.syslog('knockknock.PortOpener: Parent process is closed.  Terminating.')
@@ -40,11 +40,11 @@ class PortOpener:
             description = 'INPUT -m limit --limit 1/minute --limit-burst 1 -m state --state NEW -p tcp -s ' + sourceIP + ' --dport ' + str(port) + ' -j ACCEPT'
             addrIsIPv6 = isIPv6(sourceIP)
             if addrIsIPv6:
-                command     = 'ip6tables -I ' + description
+                command = '/usr/sbin/ip6tables -I ' + description
             else:
-                command     = 'iptables -I ' + description
+                command = '/usr/sbin/iptables -I ' + description
 
-            command     = command.split()
+            command = command.split()
 
             subprocess.call(command, shell=False)
 

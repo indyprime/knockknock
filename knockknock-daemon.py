@@ -25,8 +25,6 @@ USA
 
 import os, sys, pwd, grp
 
-from knockknock.LogEntry import LogEntry
-from knockknock.LogFile import LogFile
 from knockknock.Profiles import Profiles
 from knockknock.PortOpener import PortOpener
 from knockknock.DaemonConfiguration import DaemonConfiguration
@@ -48,6 +46,11 @@ def checkConfiguration():
         print('/etc/knockknock.d/profiles/ does not exist.  You need to setup your profiles first...')
         sys.exit(3)
 
+    # Retrieve the system init type from /proc
+    with open('/proc/1/status', 'r') as f:
+        global initprocname
+        initprocname = f.readline().split()[1]
+
 def dropPrivileges():
     nobody = pwd.getpwnam('nobody')
     adm    = grp.getgrnam('adm')
@@ -62,12 +65,20 @@ def handleFirewall(input, config):
 
 def handleKnocks(output, profiles, config):
 #    dropPrivileges()
-
-    # set logFile to location of iptable logs
-    #logFile      = LogFile('/var/log/kern.log')
-    logFile      = LogFile('/var/log/messages')
+    # Attempt to determine logging source here (since it shouldn't require
+    # elevated privileges to verify this information) based on the system
+    # init process
+    if initprocname == "systemd":
+        from knockknock.LogJournald import JournalReader
+        logSource = JournalReader()
+    elif initprocname in ["init", "preinit"]:
+        from knockknock.LogFile import LogFile
+        logSource = LogFile('/var/log/kern.log')
+    else:
+        print('Failed to find logging source for your init system. Exiting')
+        sys.exit(3)
     portOpener   = PortOpener(output, config.getDelay())
-    knockWatcher = KnockWatcher(config, logFile, profiles, portOpener)
+    knockWatcher = KnockWatcher(config, logSource, profiles, portOpener)
 
     knockWatcher.tailAndProcess()
 
