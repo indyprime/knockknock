@@ -1,3 +1,6 @@
+Note: this project has been neglected for a while, but has started getting
+work to update it again. More to come! - Indy (4/26/2025)
+
 This is a fork of Moxie Marlinspike's knockknock software, to explore some changes.
 Original website: http://www.thoughtcrime.org/software/knockknock/ 
 
@@ -102,7 +105,7 @@ knockknock Overview:
   
     The request is encrypted using AES in CTR mode, with an HMAC-SHA1
     using the encrypt-then-authenticate paradigm.  It protects against
-    evesdropping, replay attacks, and all known forms of cryptanalysis
+    eavesdropping, replay attacks, and all known forms of cryptanalysis
     against IND-CCA secure schemes.
   
 Why Is knockknock Secure?
@@ -112,13 +115,13 @@ Why Is knockknock Secure?
       easily audited, and doesn't make use of any crazy libraries like
       libpcap.
 
-    * While knockknock-daemon needs root priviledges to adjust
+    * While knockknock-daemon needs root privileges to adjust
       iptables rules, it employs privilege separation to isolate the
       code that actually runs as root to ~15 lines.  So even though
       the entire code base is very small and very simple, the only
-      part of the code actually running with root privilges is even
+      part of the code actually running with root privileges is even
       smaller and even simpler.  When you run knockknock-daemon, it
-      will fork out the privileged code and drop privilges everywhere
+      will fork out the privileged code and drop privileges everywhere
       else before processing knockknock requests.
 
     * The communication protocol is a simple IND-CCA secure encryption
@@ -129,7 +132,7 @@ Why Is knockknock Secure?
       way for them to determine which port was requested to open.
       Replaying the knock request later does them no good, and in fact
       does not provide any information that might be useful in
-      determining the contents of future requets.
+      determining the contents of future requests.
   
   
 Why Is This Even Necessary?  
