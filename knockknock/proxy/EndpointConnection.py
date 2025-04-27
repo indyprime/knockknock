@@ -1,6 +1,5 @@
 
 import asyncore
-import string
 import socket
 
 class EndpointConnection(asyncore.dispatcher_with_send):

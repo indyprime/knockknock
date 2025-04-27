@@ -16,7 +16,7 @@
 # USA
 #
 
-import string, sys, os, syslog, time
+import os, time
 
 class LogFile:
 
@@ -26,7 +26,7 @@ class LogFile:
     def checkForFileRotate(self, fd):
         freshFile = open(self.file)
 
-        if (os.path.sameopenfile(freshFile.fileno(), fd.fileno())):
+        if os.path.sameopenfile(freshFile.fileno(), fd.fileno()):
             freshFile.close()
             return fd
         else:

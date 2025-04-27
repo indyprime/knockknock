@@ -16,7 +16,7 @@
 # USA
 #
 
-import os, hmac, hashlib, sys
+import hmac, hashlib
 from .MacFailedException import MacFailedException
 from Cryptodome.Cipher import AES
 from struct import *
@@ -39,7 +39,7 @@ class CryptoEngine:
     def verifyMac(self, counter, encryptedPort, remoteMac):
         localMac = self.calculateMac(counter, encryptedPort)
 
-        if (localMac != remoteMac):
+        if localMac != remoteMac:
             raise MacFailedException('MAC doesn''t match!')
 
     def encryptCounter(self, counter):

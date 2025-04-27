@@ -30,14 +30,14 @@ class Profiles:
 
     def getProfileForPort(self, port):
         for profile in self.profiles:
-            if (int(profile.getKnockPort()) == int(port)):
+            if int(profile.getKnockPort()) == int(port):
                 return profile
 
         return None
 
     def getProfileForName(self, name):
         for profile in self.profiles:
-            if (name == profile.getName()):
+            if name == profile.getName():
                 return profile
 
         return None

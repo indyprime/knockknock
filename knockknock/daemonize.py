@@ -23,14 +23,13 @@ __version__   = "0.2"
 # minor changes by Indy in 2019, to run under Python3
 
 import os               # Miscellaneous OS interfaces.
-import sys              # System-specific parameters and functions.
 
 UMASK   = 0
 WORKDIR = "/"
 MAXFD   = 1024
 
 # The standard I/O file descriptors are redirected to /dev/null by default.
-if (hasattr(os, "devnull")):
+if hasattr(os, "devnull"):
    REDIRECT_TO = os.devnull
 else:
    REDIRECT_TO = "/dev/null"
@@ -45,14 +44,14 @@ def createDaemon():
    except OSError as e:
       raise Exception("%s [%d]" % (e.strerror, e.errno))
 
-   if (pid == 0):	# The first child.
+   if pid == 0:	# The first child.
       os.setsid()
 
       try:
          pid = os.fork()	# Fork a second child.
       except OSError as e:
          raise Exception("%s [%d]" % (e.strerror, e.errno))
-      if (pid == 0):	# The second child.
+      if pid == 0:	# The second child.
          os.chdir(WORKDIR)
          os.umask(UMASK)
       else:
@@ -76,4 +75,4 @@ def createDaemon():
    os.dup2(0, 1)			# standard output (1)
    os.dup2(0, 2)			# standard error (2)
 
-   return(0)
+   return 0

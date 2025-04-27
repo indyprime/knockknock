@@ -16,12 +16,12 @@
 # USA
 #
 
-import ipaddress
+from ipaddress import IPv6Address, AddressValueError
 
 def isIPv6(addr):
     try:
-        tmpAddr = ipaddress.IPv6Address(addr)
-        return True
-    except ipaddress.AddressValueError:
-        return False
+        _ = IPv6Address(addr)
+        return True     # IPv6 address
+    except AddressValueError:
+        return False    # IPv4 address
 

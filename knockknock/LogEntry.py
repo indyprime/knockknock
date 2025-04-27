@@ -16,7 +16,6 @@
 # USA
 #
 
-import string
 from struct import *
 
 class LogEntry:
@@ -28,7 +27,7 @@ class LogEntry:
         self.tokenMap = dict()
 
         for token in line.split():
-            index = token.find('=');
+            index = token.find('=')
             if index != -1:
                 exploded = token.split('=')
                 self.tokenMap[exploded[0]] = exploded[1]

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 __author__ = "Moxie Marlinspike"
 __email__  = "moxie@thoughtcrime.org"
@@ -34,18 +34,18 @@ def usage():
     sys.exit(3)
 
 def checkProfile(profileName):
-    if (os.path.isdir(PROFILES_DIR + profileName)):
+    if os.path.isdir(PROFILES_DIR + profileName):
         print('Profile already exists.  First rm ' + PROFILES_DIR + profileName + '/')
         sys.exit(0)
 
 def checkPortConflict(knockPort):
-    if (not os.path.isdir(PROFILES_DIR)):
+    if not os.path.isdir(PROFILES_DIR):
         return
 
     profiles        = Profiles(PROFILES_DIR)
     matchingProfile = profiles.getProfileForPort(knockPort)
 
-    if (matchingProfile != None):
+    if matchingProfile is not None:
         print('A profile already exists for knock port: ' + str(knockPort) + ' at this location: ' + matchingProfile.getDirectory())
 
 def createDirectory(profileName):

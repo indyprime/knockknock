@@ -53,12 +53,12 @@ class SocksRequestHandler(asynchat.async_chat):
         self.push(response)
 
     def setupEndpoint(self):
-        if (self.addressType == 0x01):
+        if self.addressType == 0x01:
             profile = self.profiles.getProfileForIP(self.address)
         else:
             profile = self.profiles.getProfileForName(self.address)
 
-        if profile == None:
+        if profile is None:
             self.endpoint = EndpointConnection(self, self.address, self.port)
         else:
             self.endpoint = KnockingEndpointConnection(self, profile, self.address, self.port)
@@ -67,7 +67,7 @@ class SocksRequestHandler(asynchat.async_chat):
     def processAddressAndPort(self):
         self.rawAddressAndPort = self.input
 
-        if (self.addressType == 0x01):
+        if self.addressType == 0x01:
             self.address = str(ord(self.input[0])) + '.' + str(ord(self.input[1])) + '.' + str(ord(self.input[2])) + '.' + str(ord(self.input[3]))
         else:
             self.address = self.input[0:-2]
@@ -85,15 +85,15 @@ class SocksRequestHandler(asynchat.async_chat):
         command          = ord(self.input[1])
         self.addressType = ord(self.input[3])
 
-        if (command != 0x01):
+        if command != 0x01:
             self.sendCommandNotSupportedResponse()
             self.handle_close()
             return
 
-        if (self.addressType == 0x01):
+        if self.addressType == 0x01:
             self.state = self.state + 1 # No Address Header
             return 6
-        elif (self.addressType == 0x03):
+        elif self.addressType == 0x03:
             return 1
         else:
             self.sendAddressNotSupportedResponse()
@@ -101,7 +101,7 @@ class SocksRequestHandler(asynchat.async_chat):
 
     def processAuthenticationMethod(self):
         for method in self.input:
-            if (ord(method) == 0):
+            if ord(method) == 0:
                 self.sendAuthenticationResponse(0x00)
                 return self.REQUEST_HEADER_LEN
 
@@ -112,7 +112,7 @@ class SocksRequestHandler(asynchat.async_chat):
         socksVersion = ord(self.input[0])
         methodCount  = ord(self.input[1])
 
-        if (socksVersion != 5):
+        if socksVersion != 5:
             self.handle_close()
             return
 
@@ -120,7 +120,7 @@ class SocksRequestHandler(asynchat.async_chat):
 
 
     def handle_close(self):
-        if (self.endpoint != None):
+        if self.endpoint is not None:
             self.endpoint.handle_close()
 
         asynchat.async_chat.handle_close(self)
@@ -134,7 +134,7 @@ class SocksRequestHandler(asynchat.async_chat):
         print('')
 
     def collect_incoming_data(self, data):
-        if (self.endpoint != None):
+        if self.endpoint is not None:
             self.endpoint.write(data)
         else:
             self.input.append(data)
