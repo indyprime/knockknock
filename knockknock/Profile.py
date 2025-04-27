@@ -16,11 +16,10 @@
 # USA
 #
 
-import os, string
-import configparser
+import os
+from configparser import ConfigParser
 import binascii
 import stat
-from struct import *
 
 from .CryptoEngine import CryptoEngine
 
@@ -31,7 +30,7 @@ class Profile:
         self.directory    = directory
         self.name         = directory.rstrip('/').split('/')[-1]
 
-        if (cipherKey == None):
+        if cipherKey is None:
             self.deserialize()
         else:
             self.cipherKey = cipherKey
@@ -91,7 +90,7 @@ class Profile:
 
     def loadCounter(self):
         # Privsep rubbish...
-        if (self.counterFile == None):
+        if self.counterFile is None:
             self.counterFile = open(self.directory + '/counter', 'r+')
 
         counter = self.counterFile.readline()
@@ -100,7 +99,7 @@ class Profile:
         return int(counter)
 
     def loadConfig(self):
-        config = configparser.SafeConfigParser()
+        config = ConfigParser()
         config.read(self.directory + '/config')
 
         return config.get('main', 'knock_port')
@@ -120,7 +119,7 @@ class Profile:
 
     def storeCounter(self):
         # Privsep rubbish...
-        if (self.counterFile == None):
+        if self.counterFile is None:
             self.counterFile = open(self.directory + '/counter', 'w')
             self.setPermissions(self.directory + '/counter')
 
@@ -129,7 +128,7 @@ class Profile:
         self.counterFile.flush()
 
     def storeConfig(self):
-        config = configparser.SafeConfigParser()
+        config = ConfigParser()
         config.add_section('main')
         config.set('main', 'knock_port', str(self.knockPort))
 

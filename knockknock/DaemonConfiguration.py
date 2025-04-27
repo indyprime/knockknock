@@ -16,19 +16,18 @@
 # USA
 #
 
-import os
-import configparser
+from configparser import ConfigParser, NoSectionError
 
 class DaemonConfiguration:
 
     def __init__(self, file):
         try:
-            parser = configparser.SafeConfigParser({'delay': '15', 'error_window': '20'})
+            parser = ConfigParser({'delay': '15', 'error_window': '20'})
             parser.read(file)
 
             self.delay  = int(parser.get('main', 'delay'))
             self.window = int(parser.get('main', 'error_window'))
-        except configparser.NoSectionError:
+        except NoSectionError:
             print('knockknock-daemon: config file not found, assuming defaults.')
             self.delay  = 15
             self.window = 20
