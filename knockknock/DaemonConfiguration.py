@@ -25,15 +25,23 @@ class DaemonConfiguration:
             parser = ConfigParser({'delay': '15', 'error_window': '20'})
             parser.read(file)
 
-            self.delay  = int(parser.get('main', 'delay'))
-            self.window = int(parser.get('main', 'error_window'))
+            self.delay  = parser.getint('main', 'delay')
+            self.window = parser.getint('main', 'error_window')
+            self.logging = parser.get(section='main', option='logging', fallback=None)
+            # TODO: should there be a default log location?
+            self.logfile = parser.get(section='main', option='logfile', fallback='/var/log/kern.log')
         except NoSectionError:
             print('knockknock-daemon: config file not found, assuming defaults.')
             self.delay  = 15
             self.window = 20
+            self.logging = None     # None means "no preference"
+            self.logfile = '/var/log/kern.log'
 
     def getDelay(self):
         return self.delay
 
     def getWindow(self):
         return self.window
+
+    def getLogging(self):
+        return self.logging

@@ -20,7 +20,6 @@ import os
 from configparser import ConfigParser
 import binascii
 import stat
-
 from .CryptoEngine import CryptoEngine
 
 class Profile:
@@ -40,11 +39,13 @@ class Profile:
 
         self.cryptoEngine = CryptoEngine(self, self.cipherKey, self.macKey, self.counter)
 
+
     def deserialize(self):
         self.cipherKey    = self.loadCipherKey()
         self.macKey       = self.loadMacKey()
         self.counter      = self.loadCounter()
         self.knockPort    = self.loadConfig()
+
 
     def serialize(self):
         self.storeCipherKey()
@@ -98,11 +99,14 @@ class Profile:
 
         return int(counter)
 
+
     def loadConfig(self):
         config = ConfigParser()
         config.read(self.directory + '/config')
 
-        return config.get('main', 'knock_port')
+        knock_port = config.get('main', 'knock_port')
+        return knock_port
+
 
     def loadKey(self, keyFile):
         file = open(keyFile, 'r')
@@ -111,11 +115,14 @@ class Profile:
         file.close()
         return key
 
+
     def storeCipherKey(self):
         self.storeKey(self.cipherKey, self.directory + '/cipher.key')
 
+
     def storeMacKey(self):
         self.storeKey(self.macKey, self.directory + '/mac.key')
+
 
     def storeCounter(self):
         # Privsep rubbish...
@@ -126,6 +133,7 @@ class Profile:
         self.counterFile.seek(0)
         self.counterFile.write(str(self.counter) + '\n')
         self.counterFile.flush()
+
 
     def storeConfig(self):
         config = ConfigParser()
@@ -138,12 +146,14 @@ class Profile:
 
         self.setPermissions(self.directory + '/config')
 
+
     def storeKey(self, key, path):
         file = open(path, 'w')
         file.write(binascii.b2a_base64(key).decode('utf-8'))
         file.close()
 
         self.setPermissions(path)
+
 
     # Permissions
 

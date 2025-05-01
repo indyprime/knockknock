@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 __author__ = "Moxie Marlinspike"
 __email__  = "moxie@thoughtcrime.org"
 __license__= """
@@ -25,16 +25,18 @@ Copyright (c) 2019 Indy <fireballiso@yahoo.com>
 
 """
 
-import time, os, sys
+import os, sys
 import getopt
-import subprocess
+from random import randint
 
 from struct import *
 from knockknock.Profile import Profile
 from scapy.all import *
-from ipaddress import IPv6Address
+#import scapy
+
 from knockknock.AddressType import isIPv6
 from socket import getaddrinfo, IPPROTO_UDP
+
 
 def usage():
     print('Usage: knockknock.py -p <portToOpen> [-s source_ip] [-d destination_ip] <host>'
@@ -52,11 +54,11 @@ def parseArguments(argv):
         opts, args = getopt.getopt(argv, 'h:p:s:d:')
 
         for opt, arg in opts:
-            if opt in ('-p'):
+            if opt in '-p':
                 port = arg
-            elif opt in ('-s'):
+            elif opt in '-s':
                 src_ip = arg
-            elif opt in ('-d'):
+            elif opt in '-d':
                 dst_ip = arg
             else:
                 usage()
@@ -103,21 +105,19 @@ def lookupHost(host):
 
 def chooseIP(hosts, whichAddr):
     for i in range(len(hosts)):
-        print('{0} ... {1}'.format(i, hosts[i]))
+        print(f'{i} ... {hosts[i]}')
 
     choice = -1
-    while((choice < 0) or (choice > len(hosts)-1)):
-        choice = input('{0} address to use (0-{1}):'.format(whichAddr, len(hosts)-1))
+    while (choice < 0) or (choice > len(hosts) - 1):
+        choice = input(f'{whichAddr} address to use (0-{len(hosts)-1}): ')
         try:
             choice = int(choice)
-        except:
+        except Exception as E:
             choice = -1
+            print(f'Error: {E}')
 
     return choice
 
-#another method:
-#def lookupHost(host):
-#    output = run(['nslookup', '-type=AAAA', 'www.yahoo.com'], capture_output=True)
 
 def main(argv):
     (port, host, src_ip, dst_ip) = parseArguments(argv)
@@ -130,7 +130,7 @@ def main(argv):
 
     (idField, seqField, ackField, winField) = unpack('!HIIH', packetData)
 
-    sport = random.randint(1024,65535)
+    sport = randint(1024,65535)
 
     if dst_ip == '':
         dstList = lookupHost(host)
@@ -156,14 +156,14 @@ def main(argv):
 #            src_ip = srcList[chooseIP(dstList, 'source')]
 
     # uncomment for debugging
-#    print('dst={0}, id={1}'.format(dst_ip,idField))
-#    print('sport={0},dport={1},seq={2},window={3},ack={4}'.format(sport,int(knockPort),seqField,winField,ackField))
+    #print('dst={dst_ip}, id={idField}')
+    #print('sport={sport},knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
 
     try:
-        syn=TCP(sport=sport,dport=int(knockPort),flags='S',seq=seqField,window=winField,ack=ackField)
+        syn = TCP(sport=sport,dport=int(knockPort),flags='S',seq=seqField,window=winField,ack=ackField)
         send(ip/syn, verbose=False)
 
-        print('Knock sent from {0} to {1}, TCP port {2}.'.format(ip.src, ip.dst, syn.dport))
+        print('Knock sent from {ip.src} to {ip.dst}, TCP port {syn.dport}.')
 
     except OSError:
         sys.exit(3)

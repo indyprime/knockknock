@@ -28,6 +28,7 @@ class Profiles:
             if os.path.isdir(os.path.join(directory, item)):
                 self.profiles.append(Profile(os.path.join(directory, item)))
 
+
     def getProfileForPort(self, port):
         for profile in self.profiles:
             if int(profile.getKnockPort()) == int(port):
@@ -35,12 +36,14 @@ class Profiles:
 
         return None
 
+
     def getProfileForName(self, name):
         for profile in self.profiles:
             if name == profile.getName():
                 return profile
 
         return None
+
 
     def getProfileForIP(self, ip):
         for profile in self.profiles:
@@ -51,12 +54,14 @@ class Profiles:
 
         return None
 
+
     def resolveNames(self):
         for profile in self.profiles:
-            name                     = profile.getName()
+            name = profile.getName()
             address, alias, addrlist = socket.gethostbyname_ex(name)
 
             profile.setIPAddrs(addrlist)
+
 
     def isEmpty(self):
         return len(self.profiles) == 0

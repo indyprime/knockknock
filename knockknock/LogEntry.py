@@ -23,6 +23,7 @@ class LogEntry:
     def __init__(self, line):
         self.buildTokenMap(line)
 
+
     def buildTokenMap(self, line):
         self.tokenMap = dict()
 
@@ -35,7 +36,7 @@ class LogEntry:
     def getDestinationPort(self):
         try:
             return int(self.tokenMap['DPT'])
-        except KeyError:
+        except KeyError as E:
             return -1
 
     def getEncryptedData(self, addrIsIPv6):
@@ -44,9 +45,13 @@ class LogEntry:
                 return pack('!HIIH', int(self.tokenMap['FLOWLBL']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
             else:
                 return pack('!HIIH', int(self.tokenMap['ID']), int(self.tokenMap['SEQ']), int(self.tokenMap['ACK']), int(self.tokenMap['WINDOW']))
-        except KeyError:
+        except KeyError as E:
             #tokenizer didn't find one of the expected tokens, so this log entry won't have the needed information; indicate that we can stop decryption
             return -1
 
     def getSourceIP(self):
-        return self.tokenMap['SRC']
+        try:
+            return self.tokenMap['SRC']
+        except KeyError as E:
+            return -1
+

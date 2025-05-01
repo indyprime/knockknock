@@ -22,10 +22,7 @@ Contains the JournalReader class which takes no parameters and has 1 method:
 # USA
 #
 
-import select
-import time
 from systemd import journal
-
 
 class JournalReader:
     """
@@ -36,19 +33,19 @@ class JournalReader:
     """
 
     def __init__(self):
-        """Initalization method for JournalReader class."""
+        """Initialization method for JournalReader class."""
         self.j = journal.Reader()
-        self.j.seek_tail()
+        self.j.log_level(journal.SYSTEM)
         self.j.add_match('_TRANSPORT=kernel')
-        self.p = select.poll()
-        self.p.register(self.j, self.j.get_events())
+        self.j.seek_tail()
+        self.j.get_previous()
 
     def tail(self):
         """Generator that yields messages from the kernel log."""
         while True:
-            self.p.poll()
-            line = self.j.get_next()
-            if 'MESSAGE' not in line:
-                time.sleep(.25)
-            else:
-                yield line['MESSAGE']
+            self.j.wait(-1)
+            for log_line in self.j:
+                message = log_line.get('MESSAGE', '')
+                # simple filter for iptables logs
+                if "MAC=" in message:
+                    yield message

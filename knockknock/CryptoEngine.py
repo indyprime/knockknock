@@ -21,6 +21,7 @@ from .MacFailedException import MacFailedException
 from Cryptodome.Cipher import AES
 from struct import *
 
+
 class CryptoEngine:
 
     def __init__(self, profile, cipherKey, macKey, counter):
@@ -30,6 +31,7 @@ class CryptoEngine:
         self.cipherKey = cipherKey
         self.cipher    = AES.new(self.cipherKey, AES.MODE_ECB)
 
+
     def calculateMac(self, counter, ciphertext):
         counterBytes = pack('!I', counter)
         hmacSha = hmac.new(self.macKey, counterBytes + ciphertext, hashlib.sha1)
@@ -38,7 +40,6 @@ class CryptoEngine:
 
     def verifyMac(self, counter, encryptedPort, remoteMac):
         localMac = self.calculateMac(counter, encryptedPort)
-
         if localMac != remoteMac:
             raise MacFailedException('MAC doesn''t match!')
 

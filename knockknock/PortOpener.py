@@ -16,8 +16,9 @@
 # USA
 #
 
-import os, syslog, time
+import os
 import subprocess
+import syslog
 
 from .RuleTimer import RuleTimer
 from .AddressType import isIPv6
@@ -45,10 +46,9 @@ class PortOpener:
                 command = '/usr/sbin/iptables -I ' + description
 
             command = command.split()
-
             subprocess.call(command, shell=False)
-
             RuleTimer(self.openDuration, description, addrIsIPv6).start()
+
 
     def open(self, sourceIP, port):
         try:

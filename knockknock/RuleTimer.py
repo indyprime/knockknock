@@ -20,7 +20,6 @@ import subprocess
 import time
 import threading
 
-from .AddressType import isIPv6
 
 class RuleTimer(threading.Thread):
 
@@ -33,10 +32,9 @@ class RuleTimer(threading.Thread):
     def run(self):
         time.sleep(self.openDuration)
         if self.addrIsIPv6:
-            command = 'ip6tables -D ' + self.description
+            command = '/usr/sbin/ip6tables -D ' + self.description
         else:
-            command = 'iptables -D ' + self.description
-
+            command = '/usr/sbin/iptables -D ' + self.description
         command = command.split()
 
         subprocess.call(command, shell=False)
