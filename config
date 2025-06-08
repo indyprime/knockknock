@@ -1,3 +1,5 @@
 [main]
 delay=15
 error_window=20
+logging=init
+logfile=/var/log/messages
