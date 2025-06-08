@@ -17,6 +17,7 @@
 #
 
 import os, time
+#from .knockknock_logging import do_log     # debug
 
 class LogFile:
 
@@ -24,7 +25,7 @@ class LogFile:
         self.file = file
 
     def checkForFileRotate(self, fd):
-        freshFile = open(self.file)
+        freshFile = open(self.file, 'rt')
 
         if os.path.sameopenfile(freshFile.fileno(), fd.fileno()):
             freshFile.close()
@@ -34,7 +35,7 @@ class LogFile:
             return freshFile
 
     def tail(self):
-        fd = open(self.file)
+        fd = open(self.file, 'rt')
         fd.seek(0, os.SEEK_END)
 
         while True:
@@ -45,5 +46,7 @@ class LogFile:
             if not line:
                 time.sleep(.25)
                 fd.seek(where)
-            else:
+            # look for iptables logs that have needed fields for encrypted portknock
+            elif 'MAC=' in line and 'SEQ' in line and 'ACK' in line:
+                #do_log(f'found log: {line}')       # debug
                 yield line

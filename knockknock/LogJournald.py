@@ -23,6 +23,7 @@ Contains the JournalReader class which takes no parameters and has 1 method:
 #
 
 from systemd import journal
+#from .knockknock_logging import do_log     # debug
 
 class JournalReader:
     """
@@ -40,12 +41,14 @@ class JournalReader:
         self.j.seek_tail()
         self.j.get_previous()
 
+
     def tail(self):
         """Generator that yields messages from the kernel log."""
         while True:
             self.j.wait(-1)
             for log_line in self.j:
                 message = log_line.get('MESSAGE', '')
-                # simple filter for iptables logs
-                if "MAC=" in message:
+                # look for iptables logs that have needed fields for encrypted portknock
+                if "MAC=" in message and 'SEQ' in message and 'ACK' in message:
+                    #do_log(f'found log: {message}')        # debug
                     yield message
