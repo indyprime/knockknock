@@ -21,61 +21,38 @@ USA
 
 --------
 Mods to replace hping3 with scapy code, and update to Python 3.*
-Copyright (c) 2019 Indy <fireballiso@yahoo.com>
+Copyright (c) 2019, 2025 Indy <fireballiso@yahoo.com>
 
 """
 
 import os, sys
-import getopt
 from random import randint
 
 from struct import *
-from knockknock.Profile import Profile
+import argparse
 from scapy.all import *
-#import scapy
 
+from knockknock.Profile import Profile
 from knockknock.AddressType import isIPv6
 from socket import getaddrinfo, IPPROTO_UDP
+#from knockknock.knockknock_logging import do_log       # debug
 
+def parseArguments():
+    parser = argparse.ArgumentParser(
+        prog='knockknock.py',
+        description='client to send port knock request to server',
+    )
 
-def usage():
-    print('Usage: knockknock.py -p <portToOpen> [-s source_ip] [-d destination_ip] <host>'
-        + '\n\t* source_ip can be optionally set, to specifically use a certain source IP'
-        + '\n\t* destination_ip can be optionally set, to use that instead of resolving the'
-        + '\n\t  hostname; that way, the \"host\" is only used as a profile name')
-    sys.exit(2)
+    parser.add_argument('-p', '--portToOpen', type=int, required=True, help='port to open on the server')
+    parser.add_argument('-s', '--sourceIP', type=str, help='(optional) specify source IP address from which' +
+        ' to send the knock request')
+    parser.add_argument('-d', '--destinationIP', type=str, help='(optional) specify destination address to ' +
+        'which to send the knock request. Note: this IP address will be used instead of resolving the hostname, so the ' +
+        'hostname will only be used as a profile name')
+    parser.add_argument('host', type=str, help='server hostname (or with -d, profile name)')
 
-def parseArguments(argv):
-    try:
-        port = 0
-        host = ''
-        src_ip = ''
-        dst_ip = ''
-        opts, args = getopt.getopt(argv, 'h:p:s:d:')
+    return parser.parse_args()
 
-        for opt, arg in opts:
-            if opt in '-p':
-                port = arg
-            elif opt in '-s':
-                src_ip = arg
-            elif opt in '-d':
-                dst_ip = arg
-            else:
-                usage()
-
-#        if len(args) != 1:
-        if len(args) < 1:
-            usage()
-        else:
-            host = args[0]
-
-    except getopt.GetoptError:
-        usage()
-
-    if port == 0 or host == '':
-        usage()
-
-    return (port, host, src_ip, dst_ip)
 
 def getProfile(host):
     homedir = os.path.expanduser('~')
@@ -90,18 +67,22 @@ def getProfile(host):
 
     return Profile(homedir + '/.knockknock/' + host)
 
+
 def verifyPermissions():
     if os.getuid() != 0:
         print('Sorry, you must be root to run this.')
         sys.exit(2)
 
+
 def lookupHost(host):
     hosts = getaddrinfo(host, None, proto=IPPROTO_UDP)
+    addrs = list()
 
     for i in range(len(hosts)):
-        hosts[i] = hosts[i][4][0]
+        addrs.append(hosts[i][4][0])
 
-    return hosts
+    return addrs
+
 
 def chooseIP(hosts, whichAddr):
     for i in range(len(hosts)):
@@ -119,55 +100,58 @@ def chooseIP(hosts, whichAddr):
     return choice
 
 
-def main(argv):
-    (port, host, src_ip, dst_ip) = parseArguments(argv)
+def main(args):
     verifyPermissions()
 
-    profile      = getProfile(host)
-    port         = pack('!H', int(port))
-    packetData   = profile.encrypt(port)
-    knockPort    = profile.getKnockPort()
+    profile = getProfile(args.host)
+    port = pack('!H', args.portToOpen)
+    packetData = profile.encrypt(port)
+    knockPort = profile.getKnockPort()
 
-    (idField, seqField, ackField, winField) = unpack('!HIIH', packetData)
+    idField, seqField, ackField, winField = unpack('!HIIH', packetData)
 
-    sport = randint(1024,65535)
+#    sport = randint(1024,65535)
 
-    if dst_ip == '':
-        dstList = lookupHost(host)
+    if args.destinationIP == '':
+        dstList = lookupHost(args.host)
         if len(dstList) == 1:
-            dst_ip = dstList[0]
+            args.destinationIP = dstList[0]
         else:
-            dst_ip = dstList[chooseIP(dstList, 'destination')]
+            args.destinationIP = dstList[chooseIP(dstList, 'destination')]
 
-    if isIPv6(dst_ip):
+    #do_log(f'port: {args.portToOpen}, profile: {args.host}, src_ip: {src_ip}, dst_ip: {dst_ip}')      # debug
+
+    if isIPv6(args.destinationIP):
         # IPv6
-        ip = IPv6(dst = dst_ip, fl = idField)
+        ip = IPv6(dst = args.destinationIP, fl = idField)
     else:
         # IPv4
-        ip = IP(dst = dst_ip, id = idField)
+        ip = IP(dst = args.destinationIP, id = idField)
 
-    if src_ip != '':
-        ip.src = src_ip
+    if args.sourceIP != '':
+        ip.src = args.sourceIP
 #    else:
 #        srcList = getHostAddrs
 #        if len(srcList) == 1:
-#            src_ip = srcList[0]
+#            args.sourceIP = srcList[0]
 #        else:
-#            src_ip = srcList[chooseIP(dstList, 'source')]
+#            args.sourceIP = srcList[chooseIP(dstList, 'source')]
 
     # uncomment for debugging
     #print('dst={dst_ip}, id={idField}')
-    #print('sport={sport},knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
-
+    ##print('sport={sport},knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
+    # print(knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
     try:
-        syn = TCP(sport=sport,dport=int(knockPort),flags='S',seq=seqField,window=winField,ack=ackField)
+        #syn = TCP(sport=sport,dport=int(knockPort),flags='S',seq=seqField,window=winField,ack=ackField)
+        syn = TCP(dport=int(knockPort), flags='S', seq=seqField, window=winField, ack=ackField)
         send(ip/syn, verbose=False)
 
-        print('Knock sent from {ip.src} to {ip.dst}, TCP port {syn.dport}.')
+        print(f'Knock sent from {ip.src} to {ip.dst}, TCP port {syn.dport}.')
 
     except OSError:
         sys.exit(3)
 
-if __name__ == '__main__':
-    main(sys.argv[1:])
 
+if __name__ == '__main__':
+    args = parseArguments()
+    main(args)
