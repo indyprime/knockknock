@@ -1,34 +1,36 @@
 Requirements:
   
-    * Python 3 (should already have this, since Python 2 is deprecated now)
-    * Python 3 development libraries/headers (Fedora Linux: dnf install python3-devel python3-systemd)
+    * Python 3
+    * Python 3 development libraries/headers (Fedora Linux: dnf install python3-devel)
     * PyCrypt (pip3 install pycryptodome) (alternately, for Fedora Linux: dnf install python3-pycryptodomex)
+    * python-systemd (Fedora Linux: dnf install python3-systemd)
+        * See https://github.com/systemd/python-systemd/tree/main for other Linux distributions
     * scapy (git clone https://github.com/secdev/scapy.git)
         * To install, follow the instructions on https://scapy.readthedocs.io/en/latest/installation.html,
           in the "Current development version" section. There's also instructions to update & install
           newer versions as they become available, which will likely be more frequent than Linux
           distributions update their scapy packages.
   
-Installing The Server: ******* TODO: update *******
+Installing The Server: ******* TODO: update & test *******
 
     After installing the requirements, the first step is to download,
     unpack, and install the knockknock tarball:
     
-      * wget https://github.com/indyprime/knockknock/archive/master.zip
-      * tar zxvf master.zip
+      * wget https://github.com/indyprime/knockknock/archive/refs/heads/master.zip
+      * unzip master.zip
       * cd knockknock
 
     The server needs to be running some kind of syslog service (like
     rsyslog or syslog-ng, for example) that saves iptables logs to
-    a text file (like /var/log/kern); it doesn't support the systemd
-    journalctl (though patches would be welcome!). If your system doesn't
-    have a syslog-like service, you would need to install one to get the
-    text logfiles. This is beyond the scope of these instructions, and will
-    depend on server's operating system version.
+    a text file (like /var/log/kern.log or /var/log/messages), or to
+    systemd journalctl (new addition!). If your system doesn't have one
+    of these logging services, you would need to install one to get the
+    text iptables logs. This is beyond the scope of these instructions, and
+    will depend on the server's operating system version and your preferences.
 
     Before installing knockknock, look at the logFile variable in the
     knockknock-daemon.py file, and make sure it has the correct name of
-    the file where the iptables logs are saved.
+    the file where the iptables logs are saved. ### TODO: update ###
 
     When ready, install files:
   
@@ -129,6 +131,8 @@ Configuring The Server Firewall Rules:
     You'll want all of this to be in some sort of script that runs at
     boot.
 
+#TODO - perhaps suggest only saving extra fields for valid knock port(s), to reduce additional logging
+
 Using knockknock:
 
     Now that you have knockknock-daemon running, the firewall rules
@@ -139,11 +143,35 @@ Using knockknock:
   
     * sudo knockknock -p 22 myserver.com
   
-    You now have the amount of time specified by the 'delay' parameter
+    You now have the amount of seconds specified by the 'delay' parameter
     in /etc/knockknock.d/config on the server to connect from your
     client's IP address to port 22 (defaults to 15 seconds).  As soon
     as you connect, no further connections will be allowed unless
     another knockknock request is issued.
+
+Troubleshooting: (added by Indy 4/28/2025)
+
+    If you're sending a lot of knock requests from the client that
+    either aren't received by the server, or aren't seen as valid
+    (perhaps during configuration or testing), the numeric counter in
+    the "counter" file in the machine profile on the client will be
+    greater than the value in the machine profile on the server profile
+    (since the client counter value is incremented when the knock packet
+    is sent, but the server counter value is only incremented when the
+    knock packet is actually received by the server *and* seen as valid).
+    If the difference between the two counter values becomes greater
+    than the error_window value in the knockknock "config" file, then
+    the client knocks will never succeed until the counter values are
+    manually changed to be closer than the error_window value apart from
+    each other.
+
+    In normal operations, the client counter and server counter are
+    automatically set to be the same value during a successful knock, and so
+    these two counter values usually don't deviate much from each other.
+    However, while you're configuring or testing a new server connection
+    from a client, make sure you can remain connected to both machines
+    through means other than what is provided by knockknock, to allow
+    resetting the counters (say, both to 0) when needed.
 
 Optionally using knockknock-proxy (not working under python3 - see README):
 
@@ -158,7 +186,7 @@ Optionally using knockknock-proxy (not working under python3 - see README):
 
    So knockknock-proxy is a small SOCKS proxy that is
    knockknock-aware.  It binds to a port you specify on localhost, and
-   then implements the SOCKS protocol as usual.  However, whenver it
+   then implements the SOCKS protocol as usual.  However, when it
    sees a request for a connection to a host that you have configured
    knockknock for, it quickly sends a knock to the server before
    proxying the connection through.  The upshot is that any
@@ -170,7 +198,7 @@ Optionally using knockknock-proxy (not working under python3 - see README):
     * sudo knockknock-proxy <listenPort>
 
    Be aware that while knockknock-proxy binds to localhost and isn't
-   accessable from the network, it doesn't support any type of
+   accessible from the network, it doesn't support any type of
    authentication mechanism to differentiate between users on a local
    system.  This means that it's best suited for personal, single-user
    systems.

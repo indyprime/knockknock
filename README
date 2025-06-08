@@ -57,7 +57,7 @@ Some History (mostly from Moxie's original repo):
         requests and leaves an observer knowing exactly what port is 
         about to open up.  
       * I don't want something which requires that more than one
-        packet move over the network.  
+        packet to move over the network.
       * I don't want something that uses half-baked cryptography and
         isn't provably IND-CCA secure.
     
@@ -76,13 +76,14 @@ knockknock Overview:
 
     So here's how knockknock works:
     
-      * Servers run the python app 'knockknock-daemon', and clients
-        open ports on those servers by running the python app
+      * Servers run the Python app 'knockknock-daemon', and clients
+        open ports on those servers by running the Python app
         'knockknock'
 
-      * 'knockknock-daemon' simply tails kern.log.  It doesn't bind to
-        any sockets, load libpcap and inspect every packet, or send
-        anything onto the network at all.
+      * 'knockknock-daemon' simply tails kern.log (or messages.log,
+        etc., or the systemd log).  It doesn't bind to any sockets,
+        load libpcap and inspect every packet, or send anything onto
+        the network at all.
 
       * When you want to open a port from a client, you run
         'knockknock', which sends a /single/ SYN packet to the server.
@@ -92,16 +93,16 @@ knockknock Overview:
 
       * Fields from this packet are logged to kern.log (or another log
         file) and processed by 'knockknock-daemon', which validates
-        them.
+        them and, if valid, opens the requested port.
 
       * You connect from the client to the now-open port on the
         server.
 
-      * The port closes behind you and doesn't allow any new
-        connections.
+      * The port closes behind you, after a configurable amount of
+        time, and doesn't allow any new connections.
     
   
-    That's it.  Written in python, simple, single-packet, secure.
+    That's it.  Written in Python, simple, single-packet, secure.
   
     The request is encrypted using AES in CTR mode, with an HMAC-SHA1
     using the encrypt-then-authenticate paradigm.  It protects against
@@ -111,7 +112,7 @@ knockknock Overview:
 Why Is knockknock Secure?
   
     * The knockknock-daemon code is very simple, and is written in
-      python (a 'safe' language).  The code is concise enough to be
+      Python (a 'safe' language).  The code is concise enough to be
       easily audited, and doesn't make use of any crazy libraries like
       libpcap.
 
