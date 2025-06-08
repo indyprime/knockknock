@@ -16,12 +16,13 @@
 # USA
 #
 
-import os
-import subprocess
-import syslog
+from os import _exit
+from subprocess import call
+from syslog import syslog
 
 from .RuleTimer import RuleTimer
 from .AddressType import isIPv6
+#from .knockknock_logging import do_log     # debug
 
 class PortOpener:
 
@@ -29,14 +30,15 @@ class PortOpener:
         self.stream       = stream
         self.openDuration = openDuration
 
+
     def waitForRequests(self):
         while True:
             sourceIP = self.stream.readline().rstrip('\n')
             port = self.stream.readline().rstrip('\n')
 
             if sourceIP == '' or port == '':
-                syslog.syslog('knockknock.PortOpener: Parent process is closed.  Terminating.')
-                os._exit(4)
+                syslog('knockknock.PortOpener: Parent process is closed.  Terminating.')
+                _exit(4)
 
             description = 'INPUT -m limit --limit 1/minute --limit-burst 1 -m state --state NEW -p tcp -s ' + sourceIP + ' --dport ' + str(port) + ' -j ACCEPT'
             addrIsIPv6 = isIPv6(sourceIP)
@@ -44,9 +46,10 @@ class PortOpener:
                 command = '/usr/sbin/ip6tables -I ' + description
             else:
                 command = '/usr/sbin/iptables -I ' + description
+            #do_log(f'adding iptables rule: {command}')     # debug
 
             command = command.split()
-            subprocess.call(command, shell=False)
+            call(command, shell=False)
             RuleTimer(self.openDuration, description, addrIsIPv6).start()
 
 
@@ -56,5 +59,5 @@ class PortOpener:
             self.stream.write(str(port) + '\n')
             self.stream.flush()
         except:
-            syslog.syslog('knockknock:  Error, PortOpener process has died.  Terminating.')
-            os._exit(4)
+            syslog('knockknock:  Error, PortOpener process has died.  Terminating.')
+            _exit(4)

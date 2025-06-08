@@ -17,9 +17,10 @@
 #
 
 import hmac, hashlib
+from struct import *
 from .MacFailedException import MacFailedException
 from Cryptodome.Cipher import AES
-from struct import *
+#from .knockknock_logging import do_log     # debug
 
 
 class CryptoEngine:
@@ -38,14 +39,18 @@ class CryptoEngine:
         mac     = hmacSha.digest()
         return mac[:10]
 
+
     def verifyMac(self, counter, encryptedPort, remoteMac):
         localMac = self.calculateMac(counter, encryptedPort)
         if localMac != remoteMac:
+            #do_log('doesn''t match!')      # debug
             raise MacFailedException('MAC doesn''t match!')
+
 
     def encryptCounter(self, counter):
         counterBytes = pack('!IIII', 0, 0, 0, counter)
         return self.cipher.encrypt(counterBytes)
+
 
     def encrypt(self, plaintextData):
         counterCrypt   = self.encryptCounter(self.counter)
@@ -61,6 +66,7 @@ class CryptoEngine:
         self.profile.storeCounter()
 
         return encrypted + mac
+
 
     def decrypt(self, encryptedData, windowSize):
         for x in range(windowSize):
@@ -81,7 +87,9 @@ class CryptoEngine:
                 self.profile.setCounter(self.counter)
                 self.profile.storeCounter()
 
-                return int(unpack('!H', decryptedPort)[0])
+                port = int(unpack('!H', decryptedPort)[0])
+                #do_log(f'port: {port}, counter: {self.counter}')       # debug
+                return port
 
             except MacFailedException:
                 pass

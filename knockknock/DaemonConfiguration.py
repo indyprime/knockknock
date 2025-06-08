@@ -17,6 +17,7 @@
 #
 
 from configparser import ConfigParser, NoSectionError
+#from .knockknock_logging import do_log     # debug
 
 class DaemonConfiguration:
 
@@ -30,12 +31,16 @@ class DaemonConfiguration:
             self.logging = parser.get(section='main', option='logging', fallback=None)
             # TODO: should there be a default log location?
             self.logfile = parser.get(section='main', option='logfile', fallback='/var/log/kern.log')
+            #do_log(f'config file - defaults: delay: {self.delay}, window: {self.window}, '
+            #       f'logging: {self.logging}, logfile: {self.logfile}')
         except NoSectionError:
             print('knockknock-daemon: config file not found, assuming defaults.')
             self.delay  = 15
             self.window = 20
             self.logging = None     # None means "no preference"
             self.logfile = '/var/log/kern.log'
+            #do_log(f'config file not found, assuming defaults: delay: {self.delay}, window: {self.window}, '
+            #       f'logging: {self.logging}, logfile: {self.logfile}')
 
     def getDelay(self):
         return self.delay

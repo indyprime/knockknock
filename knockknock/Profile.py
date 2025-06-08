@@ -25,16 +25,17 @@ from .CryptoEngine import CryptoEngine
 class Profile:
 
     def __init__(self, directory, cipherKey=None, macKey=None, counter=None, knockPort=None):
-        self.counterFile  = None
-        self.directory    = directory
-        self.name         = directory.rstrip('/').split('/')[-1]
+        self.counterFile = None
+        self.directory = directory
+        self.name = directory.rstrip('/').split('/')[-1]
+        self.ipAddressList = None
 
         if cipherKey is None:
             self.deserialize()
         else:
             self.cipherKey = cipherKey
-            self.macKey    = macKey
-            self.counter   = counter
+            self.macKey = macKey
+            self.counter = counter
             self.knockPort = knockPort
 
         self.cryptoEngine = CryptoEngine(self, self.cipherKey, self.macKey, self.counter)

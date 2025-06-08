@@ -19,7 +19,7 @@
 import subprocess
 import time
 import threading
-
+#from .knockknock_logging import do_log     # debug
 
 class RuleTimer(threading.Thread):
 
@@ -30,11 +30,13 @@ class RuleTimer(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        #do_log(f'started port timer: {self.openDuration} seconds')
         time.sleep(self.openDuration)
         if self.addrIsIPv6:
             command = '/usr/sbin/ip6tables -D ' + self.description
         else:
             command = '/usr/sbin/iptables -D ' + self.description
+        #do_log(f'removed iptables rule: {command}')
         command = command.split()
 
         subprocess.call(command, shell=False)

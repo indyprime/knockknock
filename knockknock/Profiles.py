@@ -16,8 +16,10 @@
 # USA
 #
 
-import os, socket
+import os
+from socket import gethostbyname_ex
 from .Profile import Profile
+#from .knockknock_logging import do_log     # debug
 
 class Profiles:
 
@@ -33,7 +35,7 @@ class Profiles:
         for profile in self.profiles:
             if int(profile.getKnockPort()) == int(port):
                 return profile
-
+        #do_log(f'no profile for port {port}')       # debug
         return None
 
 
@@ -41,7 +43,7 @@ class Profiles:
         for profile in self.profiles:
             if name == profile.getName():
                 return profile
-
+        #do_log(f'no profile for name {name}')      # debug
         return None
 
 
@@ -51,16 +53,17 @@ class Profiles:
 
             if ip in ips:
                 return profile
-
+        #do_log(f'no profile for IP {ip}')      # debug
         return None
 
 
     def resolveNames(self):
         for profile in self.profiles:
             name = profile.getName()
-            address, alias, addrlist = socket.gethostbyname_ex(name)
+            address, alias, addrlist = gethostbyname_ex(name)
 
             profile.setIPAddrs(addrlist)
+            #do_log(f'for name {name}, got address(es) {addrlist}')     # debug
 
 
     def isEmpty(self):

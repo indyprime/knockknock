@@ -22,7 +22,8 @@ __version__   = "0.2"
 
 # minor changes by Indy in 2019, to run under Python3
 
-import os               # Miscellaneous OS interfaces.
+import os        # Miscellaneous OS interfaces.
+import resource  # Resource usage information.
 
 UMASK   = 0
 WORKDIR = "/"
@@ -38,7 +39,6 @@ def createDaemon():
    """Detach a process from the controlling terminal and run it in the
    background as a daemon.
    """
-
    try:
       pid = os.fork()
    except OSError as e:
@@ -59,17 +59,16 @@ def createDaemon():
    else:
       os._exit(0)	# Exit parent of the first child.
 
-#   import resource		# Resource usage information.
-#   maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
-#   if (maxfd == resource.RLIM_INFINITY):
-#      maxfd = MAXFD
+   maxfd = resource.getrlimit(resource.RLIMIT_NOFILE)[1]
+   if maxfd == resource.RLIM_INFINITY:
+      maxfd = MAXFD
 
-   # Iterate through and close all file descriptors.
-#   for fd in range(0, maxfd):
-#      try:
-#         os.close(fd)
-#      except OSError:	# ERROR, fd wasn't open to begin with (ignored)
-#         pass
+  # Iterate through and close all file descriptors.  #TODO - needed?
+   #for fd in range(0, maxfd):
+   #   try:
+   #      os.close(fd)
+   #   except OSError:	# ERROR, fd wasn't open to begin with (ignored)
+   #      pass
 
    os.open(REDIRECT_TO, os.O_RDWR)	# standard input (0)
    os.dup2(0, 1)			# standard output (1)
