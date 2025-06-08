@@ -22,21 +22,32 @@ USA
 
 """
 
-import os, sys
+import os, argparse
+from sys import exit
+from secrets import token_bytes
+
 from knockknock.Profiles import Profiles
 from knockknock.Profile  import Profile
 
 DAEMON_DIR   = '/etc/knockknock.d/'
 PROFILES_DIR = DAEMON_DIR + 'profiles/'
 
-def usage():
-    print('knockknock-genprofile <profileName> <knockPort>')
-    sys.exit(3)
+
+def parseArguments():
+    parser = argparse.ArgumentParser(
+        prog='knockknock-genprofile.py',
+        description='Create profile for knockknock server',
+    )
+
+    parser.add_argument('profileName', type=str, help='Name of profile (can be server domain name)')
+    parser.add_argument('knockPort', type=int, help='Port to which to send the knock')
+
+    return parser.parse_args()
 
 def checkProfile(profileName):
     if os.path.isdir(PROFILES_DIR + profileName):
         print('Profile already exists.  First rm ' + PROFILES_DIR + profileName + '/')
-        sys.exit(0)
+        exit(0)
 
 def checkPortConflict(knockPort):
     if not os.path.isdir(PROFILES_DIR):
@@ -58,28 +69,25 @@ def createDirectory(profileName):
     if not os.path.isdir(PROFILES_DIR + profileName):
         os.mkdir(PROFILES_DIR + profileName)
 
-def main(argv):
+def main(args):
+    if args.knockPort < 1 or args.knockPort > 65535:
+        print('knockPort must be 1-65535')
+        exit(0)
 
-    if len(argv) != 2:
-        usage()
+    checkProfile(args.profileName)
+    checkPortConflict(args.knockPort)
+    createDirectory(args.profileName)
 
-    profileName = argv[0]
-    knockPort   = argv[1]
-
-    checkProfile(profileName)
-    checkPortConflict(knockPort)
-    createDirectory(profileName)
-
-    random    = open('/dev/urandom', 'rb')
-    cipherKey = random.read(16)
-    macKey    = random.read(16)
+    cipherKey = token_bytes(16)
+    macKey    = token_bytes(16)
     counter   = 0
 
-    profile = Profile(PROFILES_DIR + profileName, cipherKey, macKey, counter, knockPort)
+    profile = Profile(PROFILES_DIR + args.profileName, cipherKey, macKey, counter, args.knockPort)
     profile.serialize()
-    random.close()
 
-    print('Keys successfully generated in ' + PROFILES_DIR + profileName)
+    print('Keys successfully generated in ' + PROFILES_DIR + args.profileName)
+
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    args = parseArguments()
+    main(args)
