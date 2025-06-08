@@ -49,6 +49,6 @@ class JournalReader:
             for log_line in self.j:
                 message = log_line.get('MESSAGE', '')
                 # simple filter for iptables logs
-                if "MAC=" in message:
+                if "MAC=" in message and 'SEQ' in message and 'ACK' in message:
                     #do_log(f'found log: {message}')        # debug
                     yield message
