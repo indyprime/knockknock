@@ -16,10 +16,12 @@
 # USA
 #
 
-import sys
+from sys import exc_info
+from syslog import syslog
 from .LogEntry import LogEntry
 from .MacFailedException import MacFailedException
 from .AddressType import isIPv6
+#from .knockknock_logging import do_log     # debug
 
 
 class KnockWatcher:
@@ -37,15 +39,23 @@ class KnockWatcher:
                 profile  = self.profiles.getProfileForPort(logEntry.getDestinationPort())
 
                 if profile is not None:
+                    #do_log(f'got profile {profile.getName()} for port {logEntry.getDestinationPort()}')
                     try:
                         sourceIP   = logEntry.getSourceIP()
+                        #do_log(f'sourceIP: {sourceIP}')
                         ciphertext = logEntry.getEncryptedData(isIPv6(sourceIP))
                         if ciphertext != -1:
                             port = profile.decrypt(ciphertext, self.config.getWindow())
+                            #do_log(f'will open port {port}')
                             self.portOpener.open(sourceIP, port)
-                            #syslog.syslog('Received authenticated port-knock for port ' + str(port) + ' from ' + sourceIP)
+                            syslog(f'Received authenticated port-knock for port {port}) from {sourceIP}')
+                            #do_log(f'Received authenticated port-knock for port {port}) from {sourceIP}')
                     except MacFailedException:
                         pass
+                else:
+                    #do_log(f'profile is None for port {logEntry.getDestinationPort()}')
+                    pass
             except Exception as E:
-                print(f'Unexpected error: {E}\n {sys.exc_info()}')
+                print(f'Unexpected error: {E}\n {exc_info()}')
+                #do_log(f'Unexpected error: {E} - {exc_info()}')
 
