@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
-import sys, os, shutil
+from sys import argv
+from os import path, remove, popen
+from shutil import copyfile, rmtree
 from distutils.core import setup, Extension
 
-if sys.argv[1] != 'sdist':
-    shutil.copyfile('knockknock-daemon.py', 'knockknock/knockknock-daemon')
-    shutil.copyfile('knockknock-genprofile.py', 'knockknock/knockknock-genprofile')
-    shutil.copyfile('knockknock-proxy.py', 'knockknock/knockknock-proxy')
-    shutil.copyfile('knockknock.py', 'knockknock/knockknock')
+if argv[1] != 'sdist':
+    copyfile('knockknock-daemon.py', 'knockknock/knockknock-daemon')
+    copyfile('knockknock-genprofile.py', 'knockknock/knockknock-genprofile')
+    copyfile('knockknock-proxy.py', 'knockknock/knockknock-proxy')
+    copyfile('knockknock.py', 'knockknock/knockknock')
 
 setup  (name         = 'knockknock',
         version      = '0.8',
@@ -30,17 +32,17 @@ setup  (name         = 'knockknock',
 
 print('Cleaning up...')
 
-if os.path.exists('build/'):
-    shutil.rmtree('build/')
+if path.exists('build/'):
+    rmtree('build/')
 
 try:
-    os.remove('knockknock/knockknock-proxy')
-    os.remove('knockknock/knockknock-daemon')
-    os.remove('knockknock/knockknock-genprofile')
-    os.remove('knockknock/knockknock')
+    remove('knockknock/knockknock-proxy')
+    remove('knockknock/knockknock-daemon')
+    remove('knockknock/knockknock-genprofile')
+    remove('knockknock/knockknock')
 
 except:
     pass
 
 def capture(cmd):
-    return os.popen(cmd).read().strip()
+    return popen(cmd).read().strip()

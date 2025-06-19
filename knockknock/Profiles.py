@@ -16,7 +16,7 @@
 # USA
 #
 
-import os
+from os import listdir, path
 from socket import gethostbyname_ex
 from .Profile import Profile
 #from .knockknock_logging import do_log     # debug
@@ -26,9 +26,9 @@ class Profiles:
     def __init__(self, directory):
         self.profiles = list()
 
-        for item in os.listdir(directory):
-            if os.path.isdir(os.path.join(directory, item)):
-                self.profiles.append(Profile(os.path.join(directory, item)))
+        for item in listdir(directory):
+            if path.isdir(path.join(directory, item)):
+                self.profiles.append(Profile(path.join(directory, item)))
 
 
     def getProfileForPort(self, port):

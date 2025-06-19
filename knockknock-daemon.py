@@ -23,7 +23,7 @@ USA
 
 """
 
-import os
+from os import geteuid, path, setgroups, setgid, setuid, pipe, fork, close, fdopen
 from grp import getgrnam
 from pwd import getpwnam
 from sys import exit
@@ -38,17 +38,17 @@ import knockknock.daemonize
 #from knockknock.knockknock_logging import do_log       # debug
 
 def checkPrivileges():
-    if not os.geteuid() == 0:
+    if not geteuid() == 0:
         print('Sorry, you have to run knockknock-daemon as root.')
         exit(3)
 
 
 def checkConfiguration():
-    if not os.path.isdir('/etc/knockknock.d/'):
+    if not path.isdir('/etc/knockknock.d/'):
         print('/etc/knockknock.d/ does not exist.  You need to setup your profiles first...')
         exit(3)
 
-    if not os.path.isdir('/etc/knockknock.d/profiles/'):
+    if not path.isdir('/etc/knockknock.d/profiles/'):
         print('/etc/knockknock.d/profiles/ does not exist.  You need to setup your profiles first...')
         exit(3)
 
@@ -57,9 +57,9 @@ def dropPrivileges():
     nobody = getpwnam('nobody')
     adm = getgrnam('adm')
 
-    os.setgroups([adm.gr_gid])
-    os.setgid(adm.gr_gid)
-    os.setuid(nobody.pw_uid)
+    setgroups([adm.gr_gid])
+    setgid(adm.gr_gid)
+    setuid(nobody.pw_uid)
 
 
 def handleFirewall(input_pipe, config):
@@ -75,6 +75,7 @@ def handleKnocks(initprocname, output, profiles, config):
     # elevated privileges to verify this information) based on the system
     # init process. User can specify a preference in the config file, which
     # overrides automatic detection.
+
     #do_log(f'initprocname: {initprocname}, config.logging: {config.logging}')      debug
     if (config.logging in ["init", "preinit"]) or (initprocname in ["init", "preinit"]):
         logSource = LogFile(config.logfile)
@@ -109,18 +110,18 @@ def main():
         print('WARNING: Running knockknock-daemon without any active profiles.')
 
     knockknock.daemonize.createDaemon()
-    input_pipe, output_pipe = os.pipe()
-    pid = os.fork()
+    input_pipe, output_pipe = pipe()
+    pid = fork()
 
     if pid:
         # in parent process
-        os.close(input_pipe)
-        handleKnocks(initprocname, os.fdopen(output_pipe, 'w'), profiles, config)
+        close(input_pipe)
+        handleKnocks(initprocname, fdopen(output_pipe, 'w'), profiles, config)
         #do_log('handleKnocks block end')       # debug
     else:
         #in child process
-        os.close(output_pipe)
-        handleFirewall(os.fdopen(input_pipe, 'r'), config)
+        close(output_pipe)
+        handleFirewall(fdopen(input_pipe, 'r'), config)
         #do_log('handleFirewall block end')     # debug
 
 if __name__ == '__main__':

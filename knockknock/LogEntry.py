@@ -22,6 +22,7 @@ from struct import *
 class LogEntry:
 
     def __init__(self, line):
+        self.tokenMap = None
         self.buildTokenMap(line)
 
 

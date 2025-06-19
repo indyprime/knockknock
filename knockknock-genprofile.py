@@ -22,7 +22,8 @@ USA
 
 """
 
-import os, argparse
+from os import path, mkdir
+from argparse import ArgumentParser
 from sys import exit
 from secrets import token_bytes
 
@@ -34,7 +35,7 @@ PROFILES_DIR = DAEMON_DIR + 'profiles/'
 
 
 def parseArguments():
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         prog='knockknock-genprofile.py',
         description='Create profile for knockknock server',
     )
@@ -45,12 +46,12 @@ def parseArguments():
     return parser.parse_args()
 
 def checkProfile(profileName):
-    if os.path.isdir(PROFILES_DIR + profileName):
+    if path.isdir(PROFILES_DIR + profileName):
         print('Profile already exists.  First rm ' + PROFILES_DIR + profileName + '/')
         exit(0)
 
 def checkPortConflict(knockPort):
-    if not os.path.isdir(PROFILES_DIR):
+    if not path.isdir(PROFILES_DIR):
         return
 
     profiles        = Profiles(PROFILES_DIR)
@@ -60,14 +61,14 @@ def checkPortConflict(knockPort):
         print('A profile already exists for knock port: ' + str(knockPort) + ' at this location: ' + matchingProfile.getDirectory())
 
 def createDirectory(profileName):
-    if not os.path.isdir(DAEMON_DIR):
-        os.mkdir(DAEMON_DIR)
+    if not path.isdir(DAEMON_DIR):
+        mkdir(DAEMON_DIR)
 
-    if not os.path.isdir(PROFILES_DIR):
-        os.mkdir(PROFILES_DIR)
+    if not path.isdir(PROFILES_DIR):
+        mkdir(PROFILES_DIR)
 
-    if not os.path.isdir(PROFILES_DIR + profileName):
-        os.mkdir(PROFILES_DIR + profileName)
+    if not path.isdir(PROFILES_DIR + profileName):
+        mkdir(PROFILES_DIR + profileName)
 
 def main(args):
     if args.knockPort < 1 or args.knockPort > 65535:
@@ -89,5 +90,5 @@ def main(args):
 
 
 if __name__ == '__main__':
-    args = parseArguments()
-    main(args)
+    opts = parseArguments()
+    main(opts)

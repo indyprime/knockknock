@@ -16,7 +16,7 @@
 # USA
 #
 
-import os
+from os import chmod
 from configparser import ConfigParser
 import binascii
 import stat
@@ -159,7 +159,7 @@ class Profile:
     # Permissions
 
     def setPermissions(self, path):
-        os.chmod(path, stat.S_IRUSR | stat.S_IWUSR)
+        chmod(path, stat.S_IRUSR | stat.S_IWUSR)
 
     # Debug
 
