@@ -25,12 +25,11 @@ Copyright (c) 2019, 2025 Indy <fireballiso@yahoo.com>
 
 """
 
-import os, sys
-from random import randint
-
-from struct import *
-import argparse
-from scapy.all import *
+from os import getuid, path
+from sys import exit
+from struct import pack, unpack
+from argparse import ArgumentParser
+from scapy.all import IPv6, IP, TCP, send
 
 from knockknock.Profile import Profile
 from knockknock.AddressType import isIPv6
@@ -38,40 +37,40 @@ from socket import getaddrinfo, IPPROTO_UDP
 #from knockknock.knockknock_logging import do_log       # debug
 
 def parseArguments():
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         prog='knockknock.py',
         description='client to send port knock request to server',
     )
 
     parser.add_argument('-p', '--portToOpen', type=int, required=True, help='port to open on the server')
-    parser.add_argument('-s', '--sourceIP', type=str, help='(optional) specify source IP address from which' +
-        ' to send the knock request')
-    parser.add_argument('-d', '--destinationIP', type=str, help='(optional) specify destination address to ' +
-        'which to send the knock request. Note: this IP address will be used instead of resolving the hostname, so the ' +
-        'hostname will only be used as a profile name')
-    parser.add_argument('host', type=str, help='server hostname (or with -d, profile name)')
+    parser.add_argument('-s', '--sourceIP', type=str, help='(optional) specify source IP address from '
+        'which to send the knock request')
+    parser.add_argument('-d', '--destinationIP', type=str, help='(optional) specify destination address ' +
+        'to which to send the knock request. If specified, the host parameter will not be resolved to get the server ' +
+        'address')
+    parser.add_argument('host', type=str, help='server host name (or with -d, just a profile name)')
 
     return parser.parse_args()
 
 
 def getProfile(host):
-    homedir = os.path.expanduser('~')
+    homedir = path.expanduser('~')
 
-    if not os.path.isdir(homedir + '/.knockknock/'):
+    if not path.isdir(homedir + '/.knockknock/'):
         print('Error: you need to setup your profiles in ' + homedir + '/.knockknock/')
-        sys.exit(2)
+        exit(2)
 
-    if not os.path.isdir(homedir + '/.knockknock/' + host):
+    if not path.isdir(homedir + '/.knockknock/' + host):
         print('Error: profile for host ' + host + ' not found at ' + homedir + '/.knockknock/' + host)
-        sys.exit(2)
+        exit(2)
 
     return Profile(homedir + '/.knockknock/' + host)
 
 
 def verifyPermissions():
-    if os.getuid() != 0:
+    if getuid() != 0:
         print('Sorry, you must be root to run this.')
-        sys.exit(2)
+        exit(2)
 
 
 def lookupHost(host):
@@ -110,9 +109,7 @@ def main(args):
 
     idField, seqField, ackField, winField = unpack('!HIIH', packetData)
 
-#    sport = randint(1024,65535)
-
-    if args.destinationIP == '':
+    if not args.destinationIP:
         dstList = lookupHost(args.host)
         if len(dstList) == 1:
             args.destinationIP = dstList[0]
@@ -128,30 +125,23 @@ def main(args):
         # IPv4
         ip = IP(dst = args.destinationIP, id = idField)
 
-    if args.sourceIP != '':
+    if args.sourceIP:
         ip.src = args.sourceIP
-#    else:
-#        srcList = getHostAddrs
-#        if len(srcList) == 1:
-#            args.sourceIP = srcList[0]
-#        else:
-#            args.sourceIP = srcList[chooseIP(dstList, 'source')]
 
     # uncomment for debugging
-    #print('dst={dst_ip}, id={idField}')
-    ##print('sport={sport},knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
-    # print(knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
+    #print(f'dst={dst_ip}, id={idField}')
+    #print(f'sport={sport},knockPort={int(knockPort)},seq={seqField},window={winField},ack={ackField}')
+    #print(f'knockPort={knockPort},seq={seqField},window={winField},ack={ackField}')
     try:
-        #syn = TCP(sport=sport,dport=int(knockPort),flags='S',seq=seqField,window=winField,ack=ackField)
         syn = TCP(dport=int(knockPort), flags='S', seq=seqField, window=winField, ack=ackField)
         send(ip/syn, verbose=False)
 
         print(f'Knock sent from {ip.src} to {ip.dst}, TCP port {syn.dport}.')
 
     except OSError:
-        sys.exit(3)
+        exit(3)
 
 
 if __name__ == '__main__':
-    args = parseArguments()
-    main(args)
+    opts = parseArguments()
+    main(opts)
